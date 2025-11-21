@@ -3,6 +3,7 @@ export type Role = 'civilian' | 'undercover' | 'mrwhite';
 export type GamePhase = 
   | 'home'
   | 'setup'
+  | 'player-names'
   | 'role-assignment'
   | 'description-round'
   | 'discussion'

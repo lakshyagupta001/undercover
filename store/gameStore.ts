@@ -13,6 +13,7 @@ interface GameStore extends GameState {
   resetGame: () => void;
   updateSettings: (settings: Partial<GameState['settings']>) => void;
   setWordPair: (wordPair: WordPair) => void;
+  updatePlayerNames: (names: string[]) => void;
 }
 
 const avatars = ['👤', '👨', '👩', '🧑', '👴', '👵', '🧔', '👱', '🧓', '👨‍🦱'];
@@ -155,6 +156,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setWordPair: (wordPair) => {
     set({ wordPair });
+  },
+
+  updatePlayerNames: (names) => {
+    const { players } = get();
+    const updatedPlayers = players.map((player, index) => ({
+      ...player,
+      name: names[index] || player.name,
+    }));
+    set({ players: updatedPlayers });
   },
 }));
 

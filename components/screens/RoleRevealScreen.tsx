@@ -94,17 +94,14 @@ export default function RoleRevealScreen() {
           `}
         >
           <div className="text-center">
-            <div className="text-7xl mb-4 grayscale">{eliminatedPlayer.avatar}</div>
-            <h3 className="font-display text-2xl font-bold text-white mb-2">
-              {eliminatedPlayer.name}
-            </h3>
-            <div className="bg-black/30 rounded-xl p-4 mb-4">
-              <p className="text-sm text-white/70 mb-1">Role:</p>
-              <p className="text-3xl font-bold text-white">{getRoleTitle(eliminatedPlayer.role)}</p>
+            <div className="text-7xl mb-6 grayscale">{eliminatedPlayer.avatar}</div>
+            <div className="bg-black/30 rounded-xl p-6 mb-4">
+              <p className="text-sm text-white/70 mb-2">Role:</p>
+              <p className="text-4xl font-bold text-white">{getRoleTitle(eliminatedPlayer.role)}</p>
             </div>
             {eliminatedPlayer.word && (
               <div className="bg-black/30 rounded-xl p-4">
-                <p className="text-sm text-white/70 mb-1">Word:</p>
+                <p className="text-sm text-white/70 mb-1">Their Word:</p>
                 <p className="text-2xl font-bold text-white">{eliminatedPlayer.word}</p>
               </div>
             )}

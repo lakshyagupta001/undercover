@@ -15,12 +15,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Type assertion after validation
+    const validDifficulty = difficulty as 'easy' | 'medium' | 'hard';
+
     // Use environment variable or provided API key
     const geminiApiKey = apiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
     if (!geminiApiKey) {
       // Fallback to local words
-      const wordPair = getRandomWordPair(difficulty);
+      const wordPair = getRandomWordPair(validDifficulty);
       return NextResponse.json({ wordPair });
     }
 
@@ -28,25 +31,24 @@ export async function POST(request: NextRequest) {
     const genAI = new GoogleGenerativeAI(geminiApiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-    const difficultyPrompts = {
+    const difficultyPrompts: Record<'easy' | 'medium' | 'hard', string> = {
       easy: 'common, everyday objects and concepts that everyone knows',
       medium: 'moderately familiar concepts requiring some thought',
       hard: 'abstract concepts, similar meanings, or subtle differences',
     };
 
-    const prompt = `Generate a word pair for an Undercover party game with ${difficultyPrompts[difficulty]} difficulty.
+    const prompt = `Generate a word pair for an Undercover party game with ${difficultyPrompts[validDifficulty]} difficulty.
 
 Rules:
-1. Word A must be in Hindi (Devanagari script)
-2. Word B must be in English
-3. The words should be related but different enough to create interesting gameplay
-4. Words must be appropriate for all ages (no obscene, political, violent, or sensitive content)
-5. Difficulty: ${difficulty}
+1. BOTH words must be in the SAME language (either both Hindi in Devanagari script OR both English)
+2. The words should be related but different enough to create interesting gameplay
+3. Words must be appropriate for all ages (no obscene, political, violent, or sensitive content)
+4. Difficulty: ${validDifficulty}
 
 Return ONLY a valid JSON object with this exact structure (no markdown, no additional text):
 {
-  "civilian_word_hindi": "हिंदी शब्द",
-  "undercover_word_english": "English Word",
+  "civilian_word_hindi": "word in same language",
+  "undercover_word_english": "related word in same language",
   "relationship": "brief description of how they relate"
 }`;
 
@@ -62,7 +64,7 @@ Return ONLY a valid JSON object with this exact structure (no markdown, no addit
       wordPair = JSON.parse(cleanText);
     } catch (parseError) {
       console.error('Failed to parse AI response, using fallback:', parseError);
-      wordPair = getRandomWordPair(difficulty);
+      wordPair = getRandomWordPair(validDifficulty);
     }
 
     // Validate the structure

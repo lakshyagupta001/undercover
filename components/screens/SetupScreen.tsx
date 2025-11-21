@@ -32,8 +32,8 @@ export default function SetupScreen() {
       // Assign roles
       assignRoles(wordPair);
       
-      // Move to role assignment phase
-      setPhase('role-assignment');
+      // Move to player names phase
+      setPhase('player-names');
     } catch (error) {
       console.error('Error starting game:', error);
       alert('Failed to start game. Please try again.');

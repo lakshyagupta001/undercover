@@ -3,6 +3,7 @@
 import { useGameStore } from '@/store/gameStore';
 import HomeScreen from '@/components/screens/HomeScreen';
 import SetupScreen from '@/components/screens/SetupScreen';
+import PlayerNamesScreen from '@/components/screens/PlayerNamesScreen';
 import RoleAssignmentScreen from '@/components/screens/RoleAssignmentScreen';
 import GameScreen from '@/components/screens/GameScreen';
 import VotingScreen from '@/components/screens/VotingScreen';
@@ -24,6 +25,8 @@ export default function Home() {
       return <HomeScreen onShowRules={() => setShowRules(true)} />;
     case 'setup':
       return <SetupScreen />;
+    case 'player-names':
+      return <PlayerNamesScreen />;
     case 'role-assignment':
       return <RoleAssignmentScreen />;
     case 'description-round':

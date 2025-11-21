@@ -1,160 +1,160 @@
 import { WordPair } from '@/types/game';
 
 export const fallbackWords: WordPair[] = [
-  // Easy Level
+  // Easy Level - English
   {
-    civilian_word_hindi: 'किताब',
+    civilian_word_hindi: 'Book',
     undercover_word_english: 'Novel',
     relationship: 'Both are reading materials, but one is general and one is specific',
   },
   {
-    civilian_word_hindi: 'चाय',
+    civilian_word_hindi: 'Tea',
     undercover_word_english: 'Coffee',
     relationship: 'Both are hot beverages',
   },
   {
-    civilian_word_hindi: 'कुत्ता',
+    civilian_word_hindi: 'Dog',
     undercover_word_english: 'Cat',
     relationship: 'Both are common pets',
   },
   {
-    civilian_word_hindi: 'सूरज',
+    civilian_word_hindi: 'Sun',
     undercover_word_english: 'Moon',
     relationship: 'Both are celestial bodies',
   },
   {
-    civilian_word_hindi: 'गर्मी',
-    undercover_word_english: 'Summer',
-    relationship: 'Related to hot weather',
+    civilian_word_hindi: 'Hot',
+    undercover_word_english: 'Cold',
+    relationship: 'Temperature opposites',
   },
   {
-    civilian_word_hindi: 'पानी',
+    civilian_word_hindi: 'Water',
     undercover_word_english: 'Juice',
     relationship: 'Both are liquids to drink',
   },
   {
-    civilian_word_hindi: 'रोटी',
-    undercover_word_english: 'Bread',
-    relationship: 'Both are staple foods made from flour',
+    civilian_word_hindi: 'Bread',
+    undercover_word_english: 'Toast',
+    relationship: 'Both are baked goods',
   },
   {
-    civilian_word_hindi: 'फूल',
+    civilian_word_hindi: 'Flower',
     undercover_word_english: 'Rose',
     relationship: 'General vs specific flower',
   },
   {
-    civilian_word_hindi: 'पेड़',
+    civilian_word_hindi: 'Tree',
     undercover_word_english: 'Forest',
     relationship: 'Single tree vs collection of trees',
   },
   {
-    civilian_word_hindi: 'बारिश',
+    civilian_word_hindi: 'Rain',
     undercover_word_english: 'Storm',
     relationship: 'Both are weather phenomena',
   },
 
-  // Medium Level
+  // Medium Level - English
   {
-    civilian_word_hindi: 'डॉक्टर',
+    civilian_word_hindi: 'Doctor',
     undercover_word_english: 'Nurse',
     relationship: 'Both are medical professionals',
   },
   {
-    civilian_word_hindi: 'रेलगाड़ी',
+    civilian_word_hindi: 'Train',
     undercover_word_english: 'Metro',
     relationship: 'Both are rail transport systems',
   },
   {
-    civilian_word_hindi: 'टेलीविज़न',
+    civilian_word_hindi: 'Television',
     undercover_word_english: 'Cinema',
     relationship: 'Both are visual entertainment mediums',
   },
   {
-    civilian_word_hindi: 'किला',
+    civilian_word_hindi: 'Castle',
     undercover_word_english: 'Palace',
-    relationship: 'Both are historical royal structures',
+    relationship: 'Both are royal structures',
   },
   {
-    civilian_word_hindi: 'नदी',
+    civilian_word_hindi: 'River',
     undercover_word_english: 'Ocean',
     relationship: 'Both are water bodies',
   },
   {
-    civilian_word_hindi: 'हवाई जहाज',
+    civilian_word_hindi: 'Airplane',
     undercover_word_english: 'Helicopter',
     relationship: 'Both are aircraft',
   },
   {
-    civilian_word_hindi: 'संगीत',
+    civilian_word_hindi: 'Music',
     undercover_word_english: 'Song',
     relationship: 'General vs specific musical expression',
   },
   {
-    civilian_word_hindi: 'खेल',
+    civilian_word_hindi: 'Game',
     undercover_word_english: 'Match',
     relationship: 'General sport vs specific game event',
   },
   {
-    civilian_word_hindi: 'दवा',
-    undercover_word_english: 'Injection',
+    civilian_word_hindi: 'Medicine',
+    undercover_word_english: 'Pill',
     relationship: 'Both are medical treatments',
   },
   {
-    civilian_word_hindi: 'शादी',
-    undercover_word_english: 'Anniversary',
+    civilian_word_hindi: 'Wedding',
+    undercover_word_english: 'Marriage',
     relationship: 'Both are relationship celebrations',
   },
 
-  // Hard Level
+  // Hard Level - English
   {
-    civilian_word_hindi: 'न्याय',
-    undercover_word_english: 'Justice',
-    relationship: 'Same concept in different languages',
+    civilian_word_hindi: 'Justice',
+    undercover_word_english: 'Fairness',
+    relationship: 'Similar legal and moral concepts',
   },
   {
-    civilian_word_hindi: 'स्वतंत्रता',
+    civilian_word_hindi: 'Freedom',
     undercover_word_english: 'Liberty',
-    relationship: 'Similar concepts of freedom',
+    relationship: 'Similar concepts of independence',
   },
   {
-    civilian_word_hindi: 'साहस',
+    civilian_word_hindi: 'Courage',
     undercover_word_english: 'Bravery',
-    relationship: 'Same meaning - courage',
+    relationship: 'Same meaning - being brave',
   },
   {
-    civilian_word_hindi: 'ज्ञान',
+    civilian_word_hindi: 'Knowledge',
     undercover_word_english: 'Wisdom',
-    relationship: 'Knowledge vs applied knowledge',
+    relationship: 'Information vs applied knowledge',
   },
   {
-    civilian_word_hindi: 'प्रेम',
+    civilian_word_hindi: 'Love',
     undercover_word_english: 'Romance',
-    relationship: 'Love vs romantic love',
+    relationship: 'General love vs romantic love',
   },
   {
-    civilian_word_hindi: 'कला',
+    civilian_word_hindi: 'Art',
     undercover_word_english: 'Painting',
     relationship: 'General art vs specific art form',
   },
   {
-    civilian_word_hindi: 'विज्ञान',
+    civilian_word_hindi: 'Science',
     undercover_word_english: 'Physics',
     relationship: 'General science vs specific science',
   },
   {
-    civilian_word_hindi: 'इतिहास',
+    civilian_word_hindi: 'History',
     undercover_word_english: 'Heritage',
-    relationship: 'History vs cultural legacy',
+    relationship: 'Past events vs cultural legacy',
   },
   {
-    civilian_word_hindi: 'शिक्षा',
-    undercover_word_english: 'University',
-    relationship: 'Education vs institution',
+    civilian_word_hindi: 'Education',
+    undercover_word_english: 'School',
+    relationship: 'Process vs institution',
   },
   {
-    civilian_word_hindi: 'धर्म',
-    undercover_word_english: 'Spirituality',
-    relationship: 'Religion vs spiritual practice',
+    civilian_word_hindi: 'Religion',
+    undercover_word_english: 'Faith',
+    relationship: 'Organized belief vs personal belief',
   },
 ];
 
