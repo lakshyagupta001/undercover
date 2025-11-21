@@ -19,8 +19,15 @@ export default function VotingScreen() {
 
   const handleConfirmElimination = () => {
     if (selectedPlayerId) {
+      const playerToEliminate = players.find(p => p.id === selectedPlayerId);
       eliminatePlayer(selectedPlayerId);
-      setPhase('role-reveal');
+      
+      // If Mr. White is eliminated, give him a chance to guess
+      if (playerToEliminate?.role === 'mrwhite') {
+        setPhase('mrwhite-guess');
+      } else {
+        setPhase('role-reveal');
+      }
     }
   };
 

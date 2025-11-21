@@ -79,7 +79,7 @@ export default function HomeScreen({ onShowRules }: HomeScreenProps) {
         </motion.div>
       </motion.div>
 
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
@@ -87,7 +87,7 @@ export default function HomeScreen({ onShowRules }: HomeScreenProps) {
       >
         <p>Pass a single device around</p>
         <p className="mt-1">Works fully offline</p>
-      </motion.div>
+      </motion.div> */}
     </div>
   );
 }

@@ -8,6 +8,7 @@ export type GamePhase =
   | 'description-round'
   | 'discussion'
   | 'voting'
+  | 'mrwhite-guess'
   | 'role-reveal'
   | 'victory';
 

@@ -7,6 +7,7 @@ import PlayerNamesScreen from '@/components/screens/PlayerNamesScreen';
 import RoleAssignmentScreen from '@/components/screens/RoleAssignmentScreen';
 import GameScreen from '@/components/screens/GameScreen';
 import VotingScreen from '@/components/screens/VotingScreen';
+import MrWhiteGuessScreen from '@/components/screens/MrWhiteGuessScreen';
 import RoleRevealScreen from '@/components/screens/RoleRevealScreen';
 import VictoryScreen from '@/components/screens/VictoryScreen';
 import RulesScreen from '@/components/screens/RulesScreen';
@@ -34,6 +35,8 @@ export default function Home() {
       return <GameScreen />;
     case 'voting':
       return <VotingScreen />;
+    case 'mrwhite-guess':
+      return <MrWhiteGuessScreen />;
     case 'role-reveal':
       return <RoleRevealScreen />;
     case 'victory':

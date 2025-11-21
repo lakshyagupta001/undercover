@@ -29,7 +29,7 @@ export default function RoleAssignmentScreen() {
     // Auto-hide after 5 seconds
     setTimeout(() => {
       setShowWord(false);
-    }, 5000);
+    }, 50000);
   };
 
   const handleNext = () => {

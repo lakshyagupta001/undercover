@@ -14,9 +14,44 @@ export default function SetupScreen() {
   const [apiKey, setApiKey] = useState('');
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   
+  // Role counts
+  const [undercoverCount, setUndercoverCount] = useState(1);
+  const [mrWhiteCount, setMrWhiteCount] = useState(1);
+  
   const { initializePlayers, assignRoles, setPhase, updateSettings } = useGameStore();
 
+  const civilianCount = playerCount - undercoverCount - mrWhiteCount;
+
+  const adjustRoleCount = (role: 'undercover' | 'mrwhite', change: number) => {
+    if (role === 'undercover') {
+      const newCount = Math.max(0, Math.min(playerCount - 1, undercoverCount + change));
+      if (newCount + mrWhiteCount < playerCount) {
+        setUndercoverCount(newCount);
+      }
+    } else {
+      const newCount = Math.max(0, Math.min(playerCount - 1, mrWhiteCount + change));
+      if (undercoverCount + newCount < playerCount) {
+        setMrWhiteCount(newCount);
+      }
+    }
+  };
+
+  const handlePlayerCountChange = (count: number) => {
+    setPlayerCount(count);
+    // Adjust roles if they exceed new player count
+    const maxInfiltrators = count - 1; // At least 1 civilian
+    if (undercoverCount + mrWhiteCount >= count) {
+      setUndercoverCount(Math.min(1, maxInfiltrators));
+      setMrWhiteCount(Math.min(1, maxInfiltrators - undercoverCount));
+    }
+  };
+
   const handleStartGame = async () => {
+    if (civilianCount < 1) {
+      alert('You need at least 1 civilian!');
+      return;
+    }
+
     setIsLoading(true);
     
     try {
@@ -29,8 +64,8 @@ export default function SetupScreen() {
       // Generate word pair
       const wordPair = await generateWordPair(difficulty, apiKey || undefined);
       
-      // Assign roles
-      assignRoles(wordPair);
+      // Assign roles with custom counts
+      assignRoles(wordPair, undercoverCount, mrWhiteCount);
       
       // Move to player names phase
       setPhase('player-names');
@@ -66,11 +101,11 @@ export default function SetupScreen() {
         <div className="space-y-6">
           <Card>
             <h3 className="font-semibold text-xl mb-4 text-white">Number of Players</h3>
-            <div className="grid grid-cols-4 gap-2 mb-4">
+            <div className="grid grid-cols-4 gap-2">
               {[3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                 <button
                   key={num}
-                  onClick={() => setPlayerCount(num)}
+                  onClick={() => handlePlayerCountChange(num)}
                   className={`
                     py-3 rounded-lg font-semibold transition-all duration-200
                     ${playerCount === num
@@ -83,9 +118,109 @@ export default function SetupScreen() {
                 </button>
               ))}
             </div>
-            <p className="text-sm text-white/60">
-              Fixed roles: 1 Undercover + 1 Mr. White + {playerCount - 2} Civilians
-            </p>
+          </Card>
+
+          <Card>
+            <h3 className="font-semibold text-xl mb-4 text-white">Configure Roles</h3>
+            
+            {/* Civilians */}
+            <div className="mb-4 p-4 glass rounded-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-civilian flex items-center justify-center text-white font-bold">
+                    {civilianCount}
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold">Civilians</p>
+                    <p className="text-xs text-white/60">Find the infiltrators</p>
+                  </div>
+                </div>
+                <div className="text-civilian font-bold text-xl">
+                  {civilianCount}
+                </div>
+              </div>
+            </div>
+
+            {/* Undercover */}
+            <div className="mb-4 p-4 glass rounded-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-undercover flex items-center justify-center text-white font-bold">
+                    {undercoverCount}
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold">Undercover</p>
+                    <p className="text-xs text-white/60">Blend in and survive</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => adjustRoleCount('undercover', -1)}
+                    disabled={undercoverCount === 0}
+                    className="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 disabled:opacity-30 disabled:cursor-not-allowed font-bold"
+                  >
+                    −
+                  </button>
+                  <div className="w-12 text-center text-undercover font-bold text-xl">
+                    {undercoverCount}
+                  </div>
+                  <button
+                    onClick={() => adjustRoleCount('undercover', 1)}
+                    disabled={undercoverCount + mrWhiteCount >= playerCount - 1}
+                    className="w-8 h-8 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 disabled:opacity-30 disabled:cursor-not-allowed font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Mr. White */}
+            <div className="mb-4 p-4 glass rounded-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-mrwhite flex items-center justify-center text-gray-900 font-bold">
+                    {mrWhiteCount}
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold">Mr. White</p>
+                    <p className="text-xs text-white/60">No word, pure skill</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => adjustRoleCount('mrwhite', -1)}
+                    disabled={mrWhiteCount === 0}
+                    className="w-8 h-8 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 disabled:opacity-30 disabled:cursor-not-allowed font-bold"
+                  >
+                    −
+                  </button>
+                  <div className="w-12 text-center text-mrwhite font-bold text-xl">
+                    {mrWhiteCount}
+                  </div>
+                  <button
+                    onClick={() => adjustRoleCount('mrwhite', 1)}
+                    disabled={undercoverCount + mrWhiteCount >= playerCount - 1}
+                    className="w-8 h-8 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 disabled:opacity-30 disabled:cursor-not-allowed font-bold"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="pt-4 border-t border-white/10">
+              <div className="flex justify-between text-sm text-white/60">
+                <span>Total Players:</span>
+                <span className={civilianCount < 1 ? 'text-red-400' : 'text-green-400'}>
+                  {civilianCount + undercoverCount + mrWhiteCount} / {playerCount}
+                </span>
+              </div>
+              {civilianCount < 1 && (
+                <p className="text-red-400 text-xs mt-2">⚠️ Need at least 1 civilian!</p>
+              )}
+            </div>
           </Card>
 
           <Card>

@@ -5,7 +5,7 @@ interface GameStore extends GameState {
   // Actions
   setPhase: (phase: GamePhase) => void;
   initializePlayers: (count: number) => void;
-  assignRoles: (wordPair: WordPair) => void;
+  assignRoles: (wordPair: WordPair, undercoverCount?: number, mrWhiteCount?: number) => void;
   nextPlayer: () => void;
   setPlayerClueGiven: (playerId: string) => void;
   eliminatePlayer: (playerId: string) => void;
@@ -62,17 +62,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ players, currentPlayerIndex: 0, currentRound: 1 });
   },
 
-  assignRoles: (wordPair) => {
+  assignRoles: (wordPair, undercoverCount = 1, mrWhiteCount = 1) => {
     const { players } = get();
     const shuffledPlayers = shuffleArray(players);
 
-    // Assign roles: 1 Undercover, 1 Mr. White, rest Civilians
+    let undercoverAssigned = 0;
+    let mrWhiteAssigned = 0;
+
+    // Assign roles based on counts
     const updatedPlayers = shuffledPlayers.map((player, index) => {
-      if (index === 0) {
+      // Assign undercover roles first
+      if (undercoverAssigned < undercoverCount) {
+        undercoverAssigned++;
         return { ...player, role: 'undercover' as Role, word: wordPair.undercover_word_english };
-      } else if (index === 1) {
+      }
+      // Then assign Mr. White roles
+      else if (mrWhiteAssigned < mrWhiteCount) {
+        mrWhiteAssigned++;
         return { ...player, role: 'mrwhite' as Role, word: null };
-      } else {
+      }
+      // Rest are civilians
+      else {
         return { ...player, role: 'civilian' as Role, word: wordPair.civilian_word_hindi };
       }
     });
@@ -108,30 +118,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { players } = get();
     const alivePlayers = players.filter(p => p.isAlive);
     
-    const undercoverAlive = alivePlayers.some(p => p.role === 'undercover');
-    const mrWhiteAlive = alivePlayers.some(p => p.role === 'mrwhite');
+    const undercoverAlive = alivePlayers.filter(p => p.role === 'undercover').length;
+    const mrWhiteAlive = alivePlayers.filter(p => p.role === 'mrwhite').length;
     const civiliansAlive = alivePlayers.filter(p => p.role === 'civilian').length;
+    const infiltratorsAlive = undercoverAlive + mrWhiteAlive;
 
-    // Civilians win if both infiltrators are eliminated
-    if (!undercoverAlive && !mrWhiteAlive) {
+    // Civilians win if ALL infiltrators are eliminated
+    if (infiltratorsAlive === 0) {
       set({ winner: 'civilians', phase: 'victory' });
       return;
     }
 
-    // Infiltrators win if only 2 players remain and both are infiltrators
-    if (alivePlayers.length === 2 && undercoverAlive && mrWhiteAlive) {
+    // Infiltrators win if no civilians remain
+    if (civiliansAlive === 0) {
       set({ winner: 'infiltrators', phase: 'victory' });
       return;
     }
 
-    // Infiltrators win if only infiltrators remain
-    if (civiliansAlive === 0 && (undercoverAlive || mrWhiteAlive)) {
-      set({ winner: 'infiltrators', phase: 'victory' });
-      return;
-    }
-
-    // Infiltrators win if only 1 civilian remains with infiltrators
-    if (civiliansAlive === 1 && (undercoverAlive || mrWhiteAlive)) {
+    // Infiltrators win if they equal or outnumber civilians
+    if (infiltratorsAlive >= civiliansAlive) {
       set({ winner: 'infiltrators', phase: 'victory' });
       return;
     }

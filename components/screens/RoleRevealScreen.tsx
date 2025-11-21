@@ -99,12 +99,12 @@ export default function RoleRevealScreen() {
               <p className="text-sm text-white/70 mb-2">Role:</p>
               <p className="text-4xl font-bold text-white">{getRoleTitle(eliminatedPlayer.role)}</p>
             </div>
-            {eliminatedPlayer.word && (
+            {/* {eliminatedPlayer.word && (
               <div className="bg-black/30 rounded-xl p-4">
                 <p className="text-sm text-white/70 mb-1">Their Word:</p>
                 <p className="text-2xl font-bold text-white">{eliminatedPlayer.word}</p>
               </div>
-            )}
+            )} */}
           </div>
         </motion.div>
 
