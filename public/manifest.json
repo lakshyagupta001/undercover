@@ -1,0 +1,11 @@
+{
+  "name": "The Infiltrators & The Ghost",
+  "short_name": "Undercover",
+  "description": "A social deduction party game of trust, wordplay, and tactical voting",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#6366f1",
+  "orientation": "portrait"
+}
+
