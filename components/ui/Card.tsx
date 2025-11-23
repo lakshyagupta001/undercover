@@ -18,9 +18,9 @@ export default function Card({ children, className = '', glass = true, onClick }
       transition={{ duration: 0.3 }}
       onClick={onClick}
       className={`
-        ${glass ? 'glass' : 'bg-slate-800'}
-        rounded-2xl p-6 shadow-xl
-        ${onClick ? 'cursor-pointer hover:bg-white/10' : ''}
+        ${glass ? 'glass' : 'bg-surface'}
+        rounded-2xl p-6 shadow-xl border border-ivory/5
+        ${onClick ? 'cursor-pointer hover:bg-surface-light/50 hover:border-ivory/10' : ''}
         ${className}
       `}
     >

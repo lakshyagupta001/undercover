@@ -51,7 +51,7 @@ export default function VotingScreen() {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6 bg-base">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
       <motion.div
@@ -60,10 +60,10 @@ export default function VotingScreen() {
         className="text-center mb-8"
       >
         <div className="text-6xl mb-4">⚠️</div>
-        <h1 className="font-display text-3xl font-bold mb-2 text-white">
+        <h1 className="font-display text-3xl font-bold mb-2 text-ivory">
           Select Player to Eliminate
         </h1>
-        <p className="text-white/60">
+        <p className="text-ivory-dim">
           Discuss and agree, then select who to eliminate
         </p>
       </motion.div>
@@ -86,7 +86,7 @@ export default function VotingScreen() {
                 onClick={() => handleSelectPlayer(player.id)}
                 className={`
                   cursor-pointer transition-all duration-300
-                  ${isSelected ? 'ring-4 ring-red-500 bg-red-500/20' : 'hover:bg-white/10'}
+                  ${isSelected ? 'ring-4 ring-accent bg-accent/20 border-accent/40' : 'hover:bg-surface-light/50'}
                 `}
               >
                 <div className="text-center relative">
@@ -96,7 +96,7 @@ export default function VotingScreen() {
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg"
+                      className="absolute -top-2 -right-2 bg-accent text-ivory rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg"
                     >
                       ✓
                     </motion.div>
@@ -115,14 +115,14 @@ export default function VotingScreen() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6"
         >
-          <Card className="bg-gradient-to-r from-red-600/20 to-orange-600/20">
+          <Card className="bg-gradient-to-r from-accent/20 to-accent-dark/20 border border-accent/30">
             <div className="text-center">
-              <p className="text-white/70 mb-2">Selected for elimination:</p>
+              <p className="text-ivory-soft mb-2">Selected for elimination:</p>
               <div className="flex items-center justify-center gap-3">
                 <span className="text-4xl">
                   {players.find(p => p.id === selectedPlayerId)?.avatar}
                 </span>
-                <span className="text-2xl font-bold text-white">
+                <span className="text-2xl font-bold text-ivory">
                   {players.find(p => p.id === selectedPlayerId)?.name}
                 </span>
               </div>
@@ -144,7 +144,7 @@ export default function VotingScreen() {
           </Button>
         ) : (
           <Card>
-            <p className="text-center text-white/70 text-sm">
+            <p className="text-center text-ivory-soft text-sm">
               Select a player above to eliminate them
             </p>
           </Card>

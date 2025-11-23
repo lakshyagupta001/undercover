@@ -26,8 +26,14 @@ export default function PlayerAvatar({
 
   const roleColors = {
     civilian: 'ring-civilian',
-    undercover: 'ring-undercover',
-    mrwhite: 'ring-mrwhite',
+    undercover: 'ring-accent',
+    mrwhite: 'ring-gold',
+  };
+
+  const roleGradients = {
+    civilian: 'from-civilian to-civilian-dark',
+    undercover: 'from-accent to-accent-dark',
+    mrwhite: 'from-gold to-gold-dark',
   };
 
   return (
@@ -40,21 +46,26 @@ export default function PlayerAvatar({
           ${sizes[size]}
           rounded-full
           flex items-center justify-center
-          ${player.isAlive ? 'bg-gradient-to-br from-purple-500 to-blue-500' : 'bg-gray-600 opacity-50'}
+          ${player.isAlive ? `bg-gradient-to-br ${showRole ? roleGradients[player.role] : 'from-surface-light to-surface-dark'}` : 'bg-surface-dark opacity-50'}
           ${showRole ? `ring-4 ${roleColors[player.role]}` : ''}
-          ${isSelected ? 'ring-4 ring-yellow-400' : ''}
+          ${isSelected ? 'ring-4 ring-gold' : ''}
           ${onClick ? 'cursor-pointer' : ''}
-          shadow-lg transition-all duration-300
+          shadow-lg transition-all duration-300 border border-ivory/10
         `}
       >
         <span className={player.isAlive ? '' : 'grayscale'}>{player.avatar}</span>
       </motion.div>
       <div className="text-center">
-        <p className={`text-sm font-medium ${player.isAlive ? 'text-white' : 'text-gray-500'}`}>
+        <p className={`text-sm font-medium ${player.isAlive ? 'text-ivory' : 'text-ivory-faint'}`}>
           {player.name}
         </p>
         {showRole && (
-          <p className="text-xs text-gray-400 capitalize">{player.role}</p>
+          <p className={`text-xs capitalize ${
+            player.role === 'civilian' ? 'text-civilian' : 
+            player.role === 'undercover' ? 'text-accent' : 'text-gold'
+          }`}>
+            {player.role === 'mrwhite' ? 'Mr. White' : player.role}
+          </p>
         )}
       </div>
     </div>

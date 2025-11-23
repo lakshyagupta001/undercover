@@ -46,7 +46,7 @@ export default function MrWhiteGuessScreen() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-base">
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -62,10 +62,10 @@ export default function MrWhiteGuessScreen() {
               className="text-center mb-8"
             >
               <div className="text-6xl mb-4">👻</div>
-              <h1 className="font-display text-3xl font-bold text-white mb-2">
+              <h1 className="font-display text-3xl font-bold text-ivory mb-2">
                 Mr. White&apos;s Last Chance!
               </h1>
-              <p className="text-white/60">
+              <p className="text-ivory-dim">
                 Guess the civilian word to win
               </p>
             </motion.div>
@@ -77,11 +77,11 @@ export default function MrWhiteGuessScreen() {
               transition={{ delay: 0.3 }}
               className="mb-6"
             >
-              <Card className="bg-gradient-to-r from-gray-600/20 to-gray-400/20">
-                <p className="text-white/80 text-center mb-4">
+              <Card className="bg-gradient-to-r from-gold/20 to-gold-dark/20 border border-gold/30">
+                <p className="text-ivory-soft text-center mb-4">
                   You&apos;ve been discovered, but you have ONE chance to guess the civilian word!
                 </p>
-                <p className="text-white/60 text-sm text-center">
+                <p className="text-ivory-dim text-sm text-center">
                   If you guess correctly, the infiltrators win the game!
                 </p>
               </Card>
@@ -95,7 +95,7 @@ export default function MrWhiteGuessScreen() {
               className="mb-6"
             >
               <Card>
-                <label className="block text-white/70 text-sm mb-2">
+                <label className="block text-ivory-soft text-sm mb-2">
                   Enter your guess:
                 </label>
                 <input
@@ -103,7 +103,7 @@ export default function MrWhiteGuessScreen() {
                   value={guess}
                   onChange={(e) => setGuess(e.target.value)}
                   placeholder="Type the civilian word..."
-                  className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3 text-white text-lg placeholder-white/40 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                  className="w-full bg-base/50 border border-ivory/20 rounded-lg px-4 py-3 text-ivory text-lg placeholder-ivory-faint focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all"
                   autoFocus
                   onKeyPress={(e) => e.key === 'Enter' && handleSubmitGuess()}
                 />
@@ -118,7 +118,7 @@ export default function MrWhiteGuessScreen() {
               className="space-y-3"
             >
               <Button
-                variant="primary"
+                variant="gold"
                 size="lg"
                 fullWidth
                 onClick={handleSubmitGuess}
@@ -156,14 +156,14 @@ export default function MrWhiteGuessScreen() {
                   >
                     🎉
                   </motion.div>
-                  <h2 className="font-display text-4xl font-bold text-green-400 mb-4">
+                  <h2 className="font-display text-4xl font-bold text-success-light mb-4">
                     Correct!
                   </h2>
-                  <Card className="bg-gradient-to-r from-green-600/20 to-emerald-600/20 mb-6">
-                    <p className="text-white/90 text-lg mb-2">
-                      The civilian word was: <span className="font-bold">{wordPair?.civilian_word}</span>
+                  <Card className="bg-gradient-to-r from-success/20 to-success-light/20 border border-success/30 mb-6">
+                    <p className="text-ivory text-lg mb-2">
+                      The civilian word was: <span className="font-bold text-gold">{wordPair?.civilian_word}</span>
                     </p>
-                    <p className="text-white/70">
+                    <p className="text-ivory-soft">
                       Mr. White has won! Infiltrators Victory!
                     </p>
                   </Card>
@@ -179,23 +179,23 @@ export default function MrWhiteGuessScreen() {
                   >
                     ❌
                   </motion.div>
-                  <h2 className="font-display text-4xl font-bold text-red-400 mb-4">
+                  <h2 className="font-display text-4xl font-bold text-accent mb-4">
                     Wrong!
                   </h2>
-                  <Card className="bg-gradient-to-r from-red-600/20 to-orange-600/20 mb-6">
-                    <p className="text-white/90 text-lg mb-2">
+                  <Card className="bg-gradient-to-r from-accent/20 to-accent-dark/20 border border-accent/30 mb-6">
+                    <p className="text-ivory text-lg mb-2">
                       Your guess: <span className="font-bold">{guess}</span>
                     </p>
-                    <p className="text-white/90 text-lg mb-2">
-                      Correct word: <span className="font-bold">{wordPair?.civilian_word}</span>
+                    <p className="text-ivory text-lg mb-2">
+                      Correct word: <span className="font-bold text-civilian">{wordPair?.civilian_word}</span>
                     </p>
-                    <p className="text-white/70">
+                    <p className="text-ivory-soft">
                       Better luck next time!
                     </p>
                   </Card>
                 </>
               )}
-              <div className="text-white/60 text-sm">
+              <div className="text-ivory-dim text-sm">
                 {isCorrect ? 'Proceeding to victory screen...' : 'Continuing game...'}
               </div>
             </motion.div>

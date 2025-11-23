@@ -19,7 +19,7 @@ export default function Modal({ isOpen, onClose, children, showCloseButton = tru
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-base/80 backdrop-blur-sm z-40"
             onClick={onClose}
           />
           <motion.div
@@ -29,11 +29,11 @@ export default function Modal({ isOpen, onClose, children, showCloseButton = tru
             transition={{ type: 'spring', duration: 0.5 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="glass rounded-3xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto relative">
+            <div className="glass rounded-3xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto relative border border-ivory/10">
               {showCloseButton && onClose && (
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 text-white/60 hover:text-white text-2xl"
+                  className="absolute top-4 right-4 text-ivory-dim hover:text-ivory text-2xl transition-colors"
                 >
                   ✕
                 </button>

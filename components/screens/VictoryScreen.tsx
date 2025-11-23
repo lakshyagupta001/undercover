@@ -45,14 +45,14 @@ export default function VictoryScreen() {
         title: 'Civilians Victory! 🎉',
         subtitle: 'The infiltrators have been exposed!',
         icon: '🛡️',
-        color: 'from-blue-500 to-blue-700',
+        color: 'from-civilian to-civilian-dark',
       };
     } else {
       return {
         title: 'Infiltrators Victory! 🎭',
         subtitle: 'Deception and cunning prevail!',
         icon: '🎯',
-        color: 'from-red-500 to-red-700',
+        color: 'from-accent to-accent-dark',
       };
     }
   };
@@ -60,13 +60,14 @@ export default function VictoryScreen() {
   const victory = getVictoryMessage();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-y-auto">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 overflow-y-auto bg-base">
       {showConfetti && (
         <Confetti
           width={windowSize.width}
           height={windowSize.height}
           recycle={false}
           numberOfPieces={500}
+          colors={['#9A1B1B', '#C2A469', '#4A6FA5', '#F5F5F5', '#2B2E32']}
         />
       )}
 
@@ -98,10 +99,10 @@ export default function VictoryScreen() {
             {victory.icon}
           </motion.div>
           
-          <h1 className="font-display text-5xl font-bold mb-3 text-white">
+          <h1 className="font-display text-5xl font-bold mb-3 text-ivory">
             {victory.title}
           </h1>
-          <p className="text-xl text-white/70">{victory.subtitle}</p>
+          <p className="text-xl text-ivory-soft">{victory.subtitle}</p>
         </motion.div>
 
         {/* Winners Section */}
@@ -111,8 +112,8 @@ export default function VictoryScreen() {
           transition={{ delay: 0.4 }}
           className="mb-6"
         >
-          <Card className={`bg-gradient-to-br ${victory.color}`}>
-            <h3 className="font-display text-2xl font-bold text-white mb-4 text-center">
+          <Card className={`bg-gradient-to-br ${victory.color} border-none`}>
+            <h3 className="font-display text-2xl font-bold text-ivory mb-4 text-center">
               🏆 Winners
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -138,7 +139,7 @@ export default function VictoryScreen() {
           className="mb-6"
         >
           <Card>
-            <h3 className="font-semibold text-xl text-white mb-4 text-center">
+            <h3 className="font-semibold text-xl text-ivory mb-4 text-center">
               All Players & Roles
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -152,7 +153,7 @@ export default function VictoryScreen() {
                   <div className="text-center">
                     <PlayerAvatar player={{ ...player, isAlive: true }} size="md" showRole />
                     {player.word && (
-                      <div className="mt-2 text-sm text-white/60 break-words">
+                      <div className="mt-2 text-sm text-ivory-dim break-words">
                         &quot;{player.word}&quot;
                       </div>
                     )}
@@ -171,22 +172,22 @@ export default function VictoryScreen() {
             transition={{ delay: 0.8 }}
             className="mb-6"
           >
-            <Card className="bg-gradient-to-r from-purple-600/20 to-pink-600/20">
-              <h3 className="font-semibold text-xl text-white mb-4 text-center">
+            <Card className="bg-gradient-to-r from-accent/20 to-gold/20 border border-gold/20">
+              <h3 className="font-semibold text-xl text-ivory mb-4 text-center">
                 📝 The Words
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
-                <div className="glass rounded-xl p-4 text-center">
-                  <p className="text-sm text-white/60 mb-2">Civilian Word</p>
-                  <p className="text-2xl font-bold text-blue-400">{wordPair.civilian_word}</p>
+                <div className="glass rounded-xl p-4 text-center border border-civilian/30">
+                  <p className="text-sm text-ivory-dim mb-2">Civilian Word</p>
+                  <p className="text-2xl font-bold text-civilian">{wordPair.civilian_word}</p>
                 </div>
-                <div className="glass rounded-xl p-4 text-center">
-                  <p className="text-sm text-white/60 mb-2">Undercover Word</p>
-                  <p className="text-2xl font-bold text-red-400">{wordPair.undercover_word}</p>
+                <div className="glass rounded-xl p-4 text-center border border-accent/30">
+                  <p className="text-sm text-ivory-dim mb-2">Undercover Word</p>
+                  <p className="text-2xl font-bold text-accent">{wordPair.undercover_word}</p>
                 </div>
               </div>
               <div className="mt-4 text-center">
-                <p className="text-sm text-white/60">Relationship: {wordPair.relationship}</p>
+                <p className="text-sm text-ivory-dim">Relationship: {wordPair.relationship}</p>
               </div>
             </Card>
           </motion.div>

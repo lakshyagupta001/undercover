@@ -50,7 +50,7 @@ export default function RulesScreen({ onClose }: RulesScreenProps) {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col p-6 overflow-y-auto">
+    <div className="min-h-screen flex flex-col p-6 overflow-y-auto bg-base">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -64,7 +64,7 @@ export default function RulesScreen({ onClose }: RulesScreenProps) {
       <motion.h1
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="font-display text-4xl font-bold text-center mb-8 text-white"
+        className="font-display text-4xl font-bold text-center mb-8 text-ivory"
       >
         📖 How to Play
       </motion.h1>
@@ -81,12 +81,12 @@ export default function RulesScreen({ onClose }: RulesScreenProps) {
               <div className="flex items-start gap-4">
                 <div className="text-4xl">{section.icon}</div>
                 <div className="flex-1">
-                  <h3 className="font-display text-xl font-semibold mb-3 text-white">
+                  <h3 className="font-display text-xl font-semibold mb-3 text-ivory">
                     {section.title}
                   </h3>
                   <ul className="space-y-2">
                     {section.items.map((item, i) => (
-                      <li key={i} className="text-white/70 leading-relaxed">
+                      <li key={i} className="text-ivory-soft leading-relaxed">
                         {item}
                       </li>
                     ))}
@@ -102,11 +102,11 @@ export default function RulesScreen({ onClose }: RulesScreenProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <Card className="bg-gradient-to-r from-purple-600/20 to-blue-600/20">
+          <Card className="bg-gradient-to-r from-accent/20 to-gold/20 border border-gold/20">
             <div className="text-center">
               <p className="text-2xl mb-2">🎭</p>
-              <p className="text-white/90 font-semibold mb-2">Important!</p>
-              <p className="text-white/70 text-sm">
+              <p className="text-ivory font-semibold mb-2">Important!</p>
+              <p className="text-ivory-soft text-sm">
                 Undercover and Mr. White share the same victory condition but don&apos;t know each other&apos;s identity. They must work together through clever gameplay!
               </p>
             </div>

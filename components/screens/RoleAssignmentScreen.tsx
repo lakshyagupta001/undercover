@@ -47,11 +47,11 @@ export default function RoleAssignmentScreen() {
   const getRoleColor = (role: Player['role']) => {
     switch (role) {
       case 'civilian':
-        return 'from-blue-500 to-blue-700';
+        return 'from-civilian to-civilian-dark';
       case 'undercover':
-        return 'from-red-500 to-red-700';
+        return 'from-accent to-accent-dark';
       case 'mrwhite':
-        return 'from-gray-400 to-gray-600';
+        return 'from-gold to-gold-dark';
     }
   };
 
@@ -80,7 +80,7 @@ export default function RoleAssignmentScreen() {
   if (!currentPlayer) return null;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 no-select">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 no-select bg-base">
       <AnimatePresence mode="wait">
         {!isRevealing ? (
           <motion.div
@@ -98,15 +98,15 @@ export default function RoleAssignmentScreen() {
               {currentPlayer.avatar}
             </motion.div>
 
-            <h2 className="font-display text-3xl font-bold mb-4 text-white">
+            <h2 className="font-display text-3xl font-bold mb-4 text-ivory">
               {currentPlayer.name}
             </h2>
 
-            <div className="glass rounded-2xl p-6 mb-6">
-              <p className="text-white/80 mb-4">
+            <div className="glass rounded-2xl p-6 mb-6 border border-ivory/10">
+              <p className="text-ivory-soft mb-4">
                 Tap below to view your role privately
               </p>
-              <p className="text-sm text-white/60">
+              <p className="text-sm text-ivory-dim">
                 Make sure no one else is looking!
               </p>
             </div>
@@ -120,7 +120,7 @@ export default function RoleAssignmentScreen() {
               👀 View My Role
             </Button>
 
-            <div className="mt-6 text-white/40 text-sm">
+            <div className="mt-6 text-ivory-faint text-sm">
               Player {currentPlayerIndex + 1} of {players.length}
             </div>
           </motion.div>
@@ -137,15 +137,15 @@ export default function RoleAssignmentScreen() {
               animate={{ scale: 1 }}
               transition={{ type: 'spring', duration: 0.6 }}
               className={`
-                bg-gradient-to-br from-gray-400 to-gray-600}
-                rounded-3xl p-8 mb-6 shadow-2xl
+                bg-gradient-to-br from-surface-light to-surface-dark
+                rounded-3xl p-8 mb-6 shadow-2xl border border-ivory/10
               `}
             >
               <div className="text-6xl mb-4">{currentPlayer.avatar}</div>
-              {/* <h3 className="font-display text-2xl font-bold mb-2 text-white">
+              {/* <h3 className="font-display text-2xl font-bold mb-2 text-ivory">
                 {getRoleTitle(currentPlayer.role)}
               </h3>
-              <p className="text-white/90 mb-6">{getRoleDescription(currentPlayer.role)}</p> */}
+              <p className="text-ivory-soft mb-6">{getRoleDescription(currentPlayer.role)}</p> */}
 
               <AnimatePresence>
                 {showWord && (
@@ -153,17 +153,17 @@ export default function RoleAssignmentScreen() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="bg-black/30 rounded-xl p-6 backdrop-blur-sm"
+                    className="bg-base/50 rounded-xl p-6 backdrop-blur-sm border border-ivory/10"
                   >
-                    <p className="text-white/70 text-sm mb-2">Your Word:</p>
+                    <p className="text-ivory-soft text-sm mb-2">Your Word:</p>
                     {currentPlayer.word ? (
-                      <p className="text-4xl font-bold text-white break-words">
+                      <p className="text-4xl font-bold text-gold break-words">
                         {currentPlayer.word}
                       </p>
                     ) : (
                       <div>
-                        <p className="text-3xl font-bold text-white mb-2">❓</p>
-                        <p className="text-white/80 text-2xl">
+                        <p className="text-3xl font-bold text-gold mb-2">❓</p>
+                        <p className="text-ivory-soft text-2xl">
                          You have no word!  😏 <br/> 🐻‍❄️ MR. WHITE 🐻‍❄️
                         </p>
                       </div>
@@ -173,8 +173,8 @@ export default function RoleAssignmentScreen() {
               </AnimatePresence>
             </motion.div>
 
-            <div className="glass rounded-xl p-4 mb-6">
-              <p className="text-white/70 text-sm">
+            <div className="glass rounded-xl p-4 mb-6 border border-ivory/10">
+              <p className="text-ivory-soft text-sm">
                 {showWord ? 'Memorize your word, then pass the device' : 'Tap to hide and continue'}
               </p>
             </div>
@@ -193,7 +193,7 @@ export default function RoleAssignmentScreen() {
 
       {/* Progress bar */}
       <div className="absolute bottom-8 left-6 right-6">
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+        <div className="h-2 bg-surface rounded-full overflow-hidden">
           <motion.div
             className="h-full bg-gradient-primary"
             initial={{ width: 0 }}

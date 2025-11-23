@@ -6,7 +6,7 @@ import { ReactNode } from 'react';
 interface ButtonProps {
   children: ReactNode;
   onClick?: () => void;
-  variant?: 'primary' | 'secondary' | 'danger' | 'civilian' | 'undercover' | 'mrwhite';
+  variant?: 'primary' | 'secondary' | 'danger' | 'civilian' | 'undercover' | 'mrwhite' | 'gold';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   disabled?: boolean;
@@ -25,12 +25,13 @@ export default function Button({
   const baseStyles = 'btn-hover font-semibold rounded-xl transition-all duration-300 shadow-lg';
   
   const variants = {
-    primary: 'bg-gradient-primary text-white hover:shadow-purple-500/50',
-    secondary: 'glass text-white hover:bg-white/10',
-    danger: 'bg-gradient-undercover text-white hover:shadow-red-500/50',
-    civilian: 'bg-gradient-civilian text-white hover:shadow-blue-500/50',
-    undercover: 'bg-gradient-undercover text-white hover:shadow-red-500/50',
-    mrwhite: 'bg-gradient-mrwhite text-gray-900 hover:shadow-gray-500/50',
+    primary: 'bg-gradient-primary text-ivory hover:shadow-accent/40 border border-accent-light/20',
+    secondary: 'glass text-ivory hover:bg-surface-light/50 border border-ivory/10',
+    danger: 'bg-gradient-undercover text-ivory hover:shadow-accent/40 border border-accent-light/20',
+    civilian: 'bg-gradient-civilian text-ivory hover:shadow-civilian/40 border border-civilian-light/20',
+    undercover: 'bg-gradient-undercover text-ivory hover:shadow-accent/40 border border-accent-light/20',
+    mrwhite: 'bg-gradient-mrwhite text-base hover:shadow-gold/40 border border-gold-light/20',
+    gold: 'bg-gradient-gold text-base hover:shadow-gold/40 border border-gold-light/20',
   };
 
   const sizes = {

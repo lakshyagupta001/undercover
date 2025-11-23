@@ -31,11 +31,11 @@ export default function RoleRevealScreen() {
   const getRoleColor = (role: typeof eliminatedPlayer.role) => {
     switch (role) {
       case 'civilian':
-        return 'from-blue-500 to-blue-700';
+        return 'from-civilian to-civilian-dark';
       case 'undercover':
-        return 'from-red-500 to-red-700';
+        return 'from-accent to-accent-dark';
       case 'mrwhite':
-        return 'from-gray-400 to-gray-600';
+        return 'from-gold to-gold-dark';
     }
   };
 
@@ -62,7 +62,7 @@ export default function RoleRevealScreen() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-base">
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -77,10 +77,10 @@ export default function RoleRevealScreen() {
           className="text-center mb-6"
         >
           <div className="text-6xl mb-4">☠️</div>
-          <h2 className="font-display text-3xl font-bold text-white mb-2">
+          <h2 className="font-display text-3xl font-bold text-ivory mb-2">
             Player Eliminated
           </h2>
-          <p className="text-white/60">Their role has been revealed...</p>
+          <p className="text-ivory-dim">Their role has been revealed...</p>
         </motion.div>
 
         {/* Role Reveal Card */}
@@ -90,19 +90,19 @@ export default function RoleRevealScreen() {
           transition={{ delay: 0.6, duration: 0.6 }}
           className={`
             bg-gradient-to-br ${getRoleColor(eliminatedPlayer.role)}
-            rounded-3xl p-8 shadow-2xl mb-6
+            rounded-3xl p-8 shadow-2xl mb-6 border border-ivory/10
           `}
         >
           <div className="text-center">
             <div className="text-7xl mb-6 grayscale">{eliminatedPlayer.avatar}</div>
-            <div className="bg-black/30 rounded-xl p-6 mb-4">
-              <p className="text-sm text-white/70 mb-2">Role:</p>
-              <p className="text-4xl font-bold text-white">{getRoleTitle(eliminatedPlayer.role)}</p>
+            <div className="bg-base/40 rounded-xl p-6 mb-4 backdrop-blur-sm">
+              <p className="text-sm text-ivory-soft mb-2">Role:</p>
+              <p className="text-4xl font-bold text-ivory">{getRoleTitle(eliminatedPlayer.role)}</p>
             </div>
             {/* {eliminatedPlayer.word && (
-              <div className="bg-black/30 rounded-xl p-4">
-                <p className="text-sm text-white/70 mb-1">Their Word:</p>
-                <p className="text-2xl font-bold text-white">{eliminatedPlayer.word}</p>
+              <div className="bg-base/40 rounded-xl p-4 backdrop-blur-sm">
+                <p className="text-sm text-ivory-soft mb-1">Their Word:</p>
+                <p className="text-2xl font-bold text-ivory">{eliminatedPlayer.word}</p>
               </div>
             )} */}
           </div>
@@ -113,9 +113,9 @@ export default function RoleRevealScreen() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
-          className="glass rounded-2xl p-6 mb-6 text-center"
+          className="glass rounded-2xl p-6 mb-6 text-center border border-ivory/10"
         >
-          <p className="text-white/80">
+          <p className="text-ivory-soft">
             {getRoleMessage(eliminatedPlayer.role)}
           </p>
         </motion.div>
@@ -141,7 +141,7 @@ export default function RoleRevealScreen() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4 }}
-          className="text-center mt-6 text-white/40 text-sm"
+          className="text-center mt-6 text-ivory-faint text-sm"
         >
           <p>{players.filter(p => p.isAlive).length} players remaining</p>
         </motion.div>

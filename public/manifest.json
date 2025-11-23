@@ -4,8 +4,7 @@
   "description": "A social deduction party game of trust, wordplay, and tactical voting",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#6366f1",
+  "background_color": "#121212",
+  "theme_color": "#9A1B1B",
   "orientation": "portrait"
 }
-

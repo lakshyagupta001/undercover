@@ -34,7 +34,7 @@ export default function GameScreen() {
   };
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6 bg-base">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
@@ -42,10 +42,10 @@ export default function GameScreen() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="font-display text-3xl font-bold mb-2 text-white">
+          <h1 className="font-display text-3xl font-bold mb-2 text-ivory">
             Round {currentRound}
           </h1>
-          <p className="text-white/60">
+          <p className="text-ivory-dim">
             {phase === 'description-round' ? 'Description Phase' : 'Discussion Phase'}
           </p>
         </motion.div>
@@ -59,18 +59,18 @@ export default function GameScreen() {
           <Card>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-white">{alivePlayers.length}</p>
-                <p className="text-sm text-white/60">Players Alive</p>
+                <p className="text-2xl font-bold text-ivory">{alivePlayers.length}</p>
+                <p className="text-sm text-ivory-dim">Players Alive</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">{currentRound}</p>
-                <p className="text-sm text-white/60">Current Round</p>
+                <p className="text-2xl font-bold text-gold">{currentRound}</p>
+                <p className="text-sm text-ivory-dim">Current Round</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-bold text-ivory">
                   {alivePlayers.filter(p => p.hasGivenClue).length}/{alivePlayers.length}
                 </p>
-                <p className="text-sm text-white/60">Clues Given</p>
+                <p className="text-sm text-ivory-dim">Clues Given</p>
               </div>
             </div>
           </Card>
@@ -83,17 +83,17 @@ export default function GameScreen() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <Card className="bg-gradient-to-r from-purple-600/20 to-blue-600/20">
+            <Card className="bg-gradient-to-r from-accent/20 to-gold/10 border border-accent/20">
               <div className="flex items-start gap-4">
                 <div className="text-3xl">💬</div>
                 <div>
-                  <h3 className="font-semibold text-lg mb-2 text-white">
+                  <h3 className="font-semibold text-lg mb-2 text-ivory">
                     Description Round
                   </h3>
-                  <p className="text-white/70 text-sm mb-2">
+                  <p className="text-ivory-soft text-sm mb-2">
                     Each player must give ONE clue about their word verbally, in turn.
                   </p>
-                  <p className="text-white/60 text-xs">
+                  <p className="text-ivory-dim text-xs">
                     • Civilians: Be specific but not obvious<br />
                     • Undercover: Your word is related but different<br />
                     • Mr. White: Listen and blend in!
@@ -129,8 +129,8 @@ export default function GameScreen() {
               >
                 <Card 
                   className={`
-                    ${player.hasGivenClue ? 'bg-green-500/10 border-green-500/30' : ''}
-                    ${player.isAlive ? 'cursor-pointer hover:bg-white/10' : 'opacity-50'}
+                    ${player.hasGivenClue ? 'bg-success/10 border-success/30' : ''}
+                    ${player.isAlive ? 'cursor-pointer hover:bg-surface-light/50' : 'opacity-50'}
                   `}
                   onClick={handleToggleClue}
                 >
@@ -140,7 +140,7 @@ export default function GameScreen() {
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="mt-2 text-green-400 text-2xl"
+                        className="mt-2 text-success-light text-2xl"
                       >
                         ✓
                       </motion.div>
@@ -158,7 +158,7 @@ export default function GameScreen() {
             <>
               {!allPlayersGaveClues && (
                 <Card>
-                  <p className="text-center text-white/70 text-sm">
+                  <p className="text-center text-ivory-soft text-sm">
                     Players give their clues verbally. Check them off as they speak.
                   </p>
                 </Card>
@@ -191,10 +191,10 @@ export default function GameScreen() {
               <Card>
                 <div className="text-center">
                   <div className="text-4xl mb-3">🗣️</div>
-                  <h3 className="font-semibold text-lg mb-2 text-white">
+                  <h3 className="font-semibold text-lg mb-2 text-ivory">
                     Discussion Time
                   </h3>
-                  <p className="text-white/70 text-sm">
+                  <p className="text-ivory-soft text-sm">
                     Debate who seems suspicious. When ready, proceed to voting.
                   </p>
                 </div>

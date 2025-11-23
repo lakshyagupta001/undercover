@@ -59,7 +59,7 @@ export default function PlayerNamesScreen() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-4 sm:p-6 overflow-y-auto">
+    <div className="min-h-screen flex flex-col p-4 sm:p-6 overflow-y-auto bg-base">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -75,10 +75,10 @@ export default function PlayerNamesScreen() {
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-2xl mx-auto flex-1"
       >
-        <h1 className="font-display text-3xl sm:text-4xl font-bold text-center mb-2 text-white">
+        <h1 className="font-display text-3xl sm:text-4xl font-bold text-center mb-2 text-ivory">
           Enter Player Names
         </h1>
-        <p className="text-center text-white/60 mb-6 sm:mb-8">
+        <p className="text-center text-ivory-dim mb-6 sm:mb-8">
           Customize names for all {players.length} players (optional)
         </p>
 
@@ -99,15 +99,15 @@ export default function PlayerNamesScreen() {
                     value={names[index]}
                     onChange={(e) => handleNameChange(index, e.target.value)}
                     maxLength={20}
-                    className="flex-1 bg-black/30 border border-white/20 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all text-sm sm:text-base"
+                    className="flex-1 bg-base/50 border border-ivory/20 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-ivory placeholder-ivory-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all text-sm sm:text-base"
                   />
                 </div>
               </motion.div>
             ))}
           </div>
 
-          <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/10">
-            <p className="text-xs sm:text-sm text-white/60 text-center">
+          <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-ivory/10">
+            <p className="text-xs sm:text-sm text-ivory-dim text-center">
               💡 Tip: Leave blank to use default names (Player 1, Player 2, etc.)
             </p>
           </div>
