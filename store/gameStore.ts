@@ -38,7 +38,6 @@ const generatePlayers = (count: number): Player[] => {
 };
 
 export const useGameStore = create<GameStore>((set, get) => ({
-  // Initial state
   phase: "home",
   players: [],
   currentRound: 1,
@@ -53,7 +52,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     difficulty: "medium",
   },
 
-  // Actions
   setPhase: (phase) => set({ phase }),
 
   initializePlayers: (count) => {
@@ -64,14 +62,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   assignRoles: (wordPair, undercoverCount = 1, mrWhiteCount = 1) => {
     const { players } = get();
 
-    // For fresh games (started from SetupScreen), always start role reveal from Player 1
     const nextStartIndex = 0;
 
-    // Use index-based random assignment to guarantee unbiased distribution
     const totalPlayers = players.length;
     const indices = shuffleArray(Array.from({ length: totalPlayers }, (_, i) => i));
 
-    // Pick random indices for Undercover and Mr. White
     const undercoverIndices = new Set(indices.slice(0, undercoverCount));
     const mrWhiteIndices = new Set(indices.slice(undercoverCount, undercoverCount + mrWhiteCount));
 
@@ -123,24 +118,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     ).length;
     const infiltratorsAlive = undercoverAlive + mrWhiteAlive;
 
-    // Civilians win if ALL infiltrators are eliminated (both Undercover AND Mr. White)
     if (infiltratorsAlive === 0 && civiliansAlive > 0) {
-      console.log("✓ Civilians win - all infiltrators eliminated");
       set({ winner: "civilians", phase: "victory" });
       return;
     }
 
-    // Infiltrators win if only 1 civilian is left
     if (civiliansAlive === 1 && infiltratorsAlive > 0) {
-      console.log("✓ Infiltrators win - only 1 civilian remains");
       set({ winner: "infiltrators", phase: "victory" });
       return;
     }
-
-    // No victory condition met - game continues
-    console.log(
-      `Game continues - Civilians: ${civiliansAlive}, Infiltrators: ${infiltratorsAlive}`
-    );
   },
 
   resetGame: () => {
@@ -177,10 +163,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const alivePlayers = players.filter((p) => p.isAlive);
     let shuffled = shuffleArray([...alivePlayers]);
 
-    // Ensure Mr. White is never first in the order
-    // Keep shuffling until the first player is not Mr. White, or swap if needed
     if (shuffled.length > 1 && shuffled[0].role === "mrwhite") {
-      // Find first non-Mr. White player and swap
       const nonWhiteIndex = shuffled.findIndex((p) => p.role !== "mrwhite");
       if (nonWhiteIndex !== -1) {
         [shuffled[0], shuffled[nonWhiteIndex]] = [shuffled[nonWhiteIndex], shuffled[0]];
@@ -193,10 +176,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   startNextGame: (wordPair, undercoverCount = 1, mrWhiteCount = 1) => {
     const { players, gameNumber, roleRevealStartIndex } = get();
 
-    // Rotate role reveal start index: Game 1 -> Player 1, Game 2 -> Player 2, etc.
     const nextStartIndex = (roleRevealStartIndex + 1) % players.length;
 
-    // Reset players for new game (keep names and cumulative points but reset roles/status)
     const resetPlayers = players.map((player) => ({
       ...player,
       role: "civilian" as Role,
@@ -205,7 +186,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hasGivenClue: false,
     }));
 
-    // Randomly pick indices for special roles to ensure unbiased distribution
     const totalPlayers = players.length;
     const indices = shuffleArray(Array.from({ length: totalPlayers }, (_, i) => i));
     const undercoverIndices = new Set(indices.slice(0, undercoverCount));
@@ -251,27 +231,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
   calculateAndAwardPoints: () => {
     const { players, winner, mrWhiteGuessedCorrectly } = get();
     
-    // Calculate points based on game outcome
     const updatedPlayers = players.map((player) => {
       let pointsEarned = 0;
       
       if (player.role === "civilian") {
-        // Civilians: +1 point if all infiltrators are eliminated (civilians win)
         if (winner === "civilians") {
           pointsEarned = 1;
         }
       } else if (player.role === "undercover") {
-        // Undercover: +2 points if at least one undercover survives (infiltrators win)
         if (winner === "infiltrators") {
           pointsEarned = 2;
         }
       } else if (player.role === "mrwhite") {
-        // Mr. White: +3 points if survives OR guessed correctly when eliminated
         if (winner === "infiltrators" && player.isAlive) {
-          // Mr. White survived till the end
           pointsEarned = 3;
         } else if (!player.isAlive && mrWhiteGuessedCorrectly) {
-          // Mr. White was eliminated but guessed correctly
           pointsEarned = 3;
         }
       }

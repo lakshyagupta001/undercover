@@ -55,39 +55,6 @@ export default function RoleAssignmentScreen() {
     }
   };
 
-  // const getRoleColor = (role: Player['role']) => {
-  //   switch (role) {
-  //     case 'civilian':
-  //       return 'from-civilian to-civilian-dark';
-  //     case 'undercover':
-  //       return 'from-accent to-accent-dark';
-  //     case 'mrwhite':
-  //       return 'from-gold to-gold-dark';
-  //   }
-  // };
-
-  // const getRoleTitle = (role: Player['role']) => {
-  //   switch (role) {
-  //     case 'civilian':
-  //       return 'Civilian';
-  //     case 'undercover':
-  //       return 'Undercover Agent';
-  //     case 'mrwhite':
-  //       return 'Mr. White';
-  //   }
-  // };
-
-  // const getRoleDescription = (role: Player['role']) => {
-  //   switch (role) {
-  //     case 'civilian':
-  //       return 'Find and eliminate the infiltrators!';
-  //     case 'undercover':
-  //       return 'Blend in and survive!';
-  //     case 'mrwhite':
-  //       return 'Listen carefully and adapt!';
-  //   }
-  // };
-
   if (!currentPlayer) return null;
 
   return (
@@ -153,10 +120,6 @@ export default function RoleAssignmentScreen() {
               `}
             >
               <div className="text-6xl mb-4">{currentPlayer.avatar}</div>
-              {/* <h3 className="font-display text-2xl font-bold mb-2 text-ivory">
-                {getRoleTitle(currentPlayer.role)}
-              </h3>
-              <p className="text-ivory-soft mb-6">{getRoleDescription(currentPlayer.role)}</p> */}
 
               <AnimatePresence>
                 {showWord && (

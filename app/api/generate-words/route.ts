@@ -1,4 +1,3 @@
-// app/api/generate-words/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { WordPair } from "@/types/game";
@@ -29,12 +28,10 @@ function normalizeText(raw: unknown): string {
 }
 
 export async function POST(request: NextRequest) {
-  // Accept JSON body
   let body: GenerateRequestBody = {};
   try {
     body = (await request.json()) as GenerateRequestBody;
   } catch {
-    // ignore, we'll validate later
   }
 
   const difficulty: Difficulty = (body.difficulty || "medium") as Difficulty;
@@ -45,28 +42,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Get API key from environment
   const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
-  console.log("=== GEMINI API DEBUG ===");
-  console.log(
-    "NEXT_PUBLIC_GEMINI_API_KEY:",
-    geminiApiKey ? "YES" : "NO"
-  );
-  console.log("========================");
-
-  // If no API key, return error
   if (!geminiApiKey) {
-    console.log("⚠️  NO API KEY FOUND - Cannot generate words");
     return NextResponse.json(
       { error: "Gemini API key is required. Please provide an API key to generate words." },
       { status: 400 }
     );
   }
 
-  console.log("✓ API Key found, attempting Gemini API call...");
-
-  // Model selection: allow override via request, then env var, then default
   const modelName =
     process.env.NEXT_PUBLIC_GEMINI_MODEL_NAME ||
     "gemini-2.5-flash";
@@ -77,11 +61,8 @@ export async function POST(request: NextRequest) {
     hard: "abstract concepts, similar meanings, or subtle differences",
   };
 
-  // Server-side random language selection (true randomness, not LLM-dependent)
   const selectedLanguage = Math.random() < 0.5 ? "English" : "Hinglish";
-  console.log(`🌐 Selected language for this game: ${selectedLanguage}`);
 
-  // Language-specific instructions
   const languageInstructions = selectedLanguage === "English"
     ? `- You MUST use ENGLISH words only.
 - Use common English words that are widely understood.
@@ -92,7 +73,6 @@ export async function POST(request: NextRequest) {
 - Both civilian_word and undercover_word must be in Hinglish.
 - Use simple, phonetic spellings that Indians commonly use (e.g., "Paani" not "Pani", "Chai" not "Chay").`;
 
-  // IMPORTANT: keep the response strictly JSON only in the prompt so parsing is robust
   const prompt = `
 You are a helpful assistant that returns ONLY a single JSON object.
 Do NOT include markdown, explanations, or extra text.
@@ -143,34 +123,20 @@ WORD PAIR REQUIREMENTS
 Difficulty guidance: ${difficultyPrompts[difficulty]}.`;
 
   try {
-    console.log("Initializing GoogleGenAI client...");
-    // Initialize client
     const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
-    console.log(`Calling Gemini model: ${modelName}...`);
-    // Call the generateContent API (docs/examples use `models.generateContent` with `contents`)
     const response = await ai.models.generateContent({
       model: modelName,
-      // `contents`/`content` shape is SDK dependent; `contents` (string) is supported in examples.
       contents: prompt,
-      // Optionally you can add settings like temperature, maxOutputTokens if supported by your SDK version:
-      // temperature: 0.2,
-      // maxOutputTokens: 256,
     });
 
-    console.log("✓ Gemini API call successful");
-    // The official SDK returns `response.text` (string). Use that.
     const rawText = normalizeText((response as any).text ?? "");
-    console.log("Raw response text:", rawText.substring(0, 200));
 
-    // If the SDK returned an array/staged output, also try to resolve it:
     let candidateText = rawText;
     if (!candidateText) {
-      // Try alternative common fields (defensive): e.g., response.output[0].content[0].text
       try {
         const maybe = (response as any).output ?? (response as any).candidates;
         if (Array.isArray(maybe) && maybe.length > 0) {
-          // drill down for text
           const textFromCandidates =
             maybe[0]?.content?.[0]?.text ||
             maybe[0]?.text ||
@@ -183,16 +149,13 @@ Difficulty guidance: ${difficultyPrompts[difficulty]}.`;
       }
     }
 
-    // Remove possible markdown fences and stray content
     const cleaned = (candidateText || "")
       .replace(/```(?:json)?\n?/g, "")
-      .replace(/<\/?[^>]+(>|$)/g, "") // strip HTML tags if any
+      .replace(/<\/?[^>]+(>|$)/g, "")
       .trim();
 
-    // Try to parse JSON
     let parsed = safeParseJSON<Record<string, unknown>>(cleaned);
 
-    // If parse failed, attempt to extract JSON substring
     if (!parsed) {
       const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
@@ -223,34 +186,15 @@ Difficulty guidance: ${difficultyPrompts[difficulty]}.`;
       }
     }
 
-    // If we couldn't parse or validation failed, return error
     if (!wordPair) {
-      console.warn(
-        "⚠️  AI response invalid or parse failed."
-      );
       return NextResponse.json(
         { error: "Failed to parse AI response. Please try again." },
         { status: 500 }
       );
     }
 
-    console.log("✓ Successfully generated word pair from Gemini!");
-    console.log("Word pair:", wordPair);
-    console.log("Language:", selectedLanguage);
     return NextResponse.json({ wordPair, source: "gemini", language: selectedLanguage });
   } catch (err) {
-    console.error("=== ERROR in generate-words handler ===");
-    console.error(
-      "Error type:",
-      err instanceof Error ? err.constructor.name : typeof err
-    );
-    console.error(
-      "Error message:",
-      err instanceof Error ? err.message : String(err)
-    );
-    console.error("Full error:", err);
-    
-    // Return error response
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to generate words from Gemini API" },
       { status: 500 }
