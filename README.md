@@ -1,4 +1,4 @@
-# 🎭 The Infiltrators & The Ghost
+# 🎭 Undercover
 
 A modern, AI-powered social deduction party game built with Next.js. Pass a single device around as players take on secret roles and use wordplay, deduction, and tactical voting to achieve victory.
 

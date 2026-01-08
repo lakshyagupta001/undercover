@@ -35,11 +35,8 @@ export default function HomeScreen({ onShowRules }: HomeScreenProps) {
         </motion.div>
         
         <h1 className="font-display text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-accent via-gold to-accent bg-clip-text text-transparent">
-          The Infiltrators
+          UnderCover
         </h1>
-        <h2 className="font-display text-3xl md:text-4xl font-bold mb-6 text-ivory/80">
-          & The Ghost
-        </h2>
         
         <p className="text-xl text-ivory-soft max-w-md mx-auto">
           A game of deception, wordplay, and trust
@@ -78,16 +75,6 @@ export default function HomeScreen({ onShowRules }: HomeScreenProps) {
           <p className="text-center text-2xl font-bold text-gold">3 - 20</p>
         </motion.div>
       </motion.div>
-
-      {/* <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="absolute bottom-8 text-center text-ivory-faint text-sm"
-      >
-        <p>Pass a single device around</p>
-        <p className="mt-1">Works fully offline</p>
-      </motion.div> */}
     </div>
   );
 }

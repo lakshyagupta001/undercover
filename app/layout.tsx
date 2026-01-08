@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'The Infiltrators & The Ghost',
+  title: 'Undercover',
   description: 'A social deduction party game of trust, wordplay, and tactical voting',
   appleWebApp: {
     capable: true,
