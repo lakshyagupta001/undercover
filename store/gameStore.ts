@@ -62,51 +62,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   assignRoles: (wordPair, undercoverCount = 1, mrWhiteCount = 1) => {
-    const { players, roleRevealStartIndex } = get();
-    
-    // Create a list of role assignments (shuffled) but keep players in original order
-    const totalPlayers = players.length;
-    const roles: { role: Role; word: string | null }[] = [];
-    
-    // Add undercover roles
-    for (let i = 0; i < undercoverCount; i++) {
-      roles.push({ role: "undercover" as Role, word: wordPair.undercover_word });
-    }
-    
-    // Add Mr. White roles
-    for (let i = 0; i < mrWhiteCount; i++) {
-      roles.push({ role: "mrwhite" as Role, word: null });
-    }
-    
-    // Add civilian roles
-    for (let i = undercoverCount + mrWhiteCount; i < totalPlayers; i++) {
-      roles.push({ role: "civilian" as Role, word: wordPair.civilian_word });
-    }
-    
-    // Shuffle roles (not players!)
-    let shuffledRoles = shuffleArray([...roles]);
-    
-    // CRITICAL: Ensure the first player in role reveal order NEVER gets Mr. White
-    // The first player in reveal order is at roleRevealStartIndex
-    if (shuffledRoles[roleRevealStartIndex]?.role === "mrwhite") {
-      // Find a non-Mr. White role to swap with
-      const nonWhiteIndex = shuffledRoles.findIndex((r) => r.role !== "mrwhite");
-      if (nonWhiteIndex !== -1) {
-        [shuffledRoles[roleRevealStartIndex], shuffledRoles[nonWhiteIndex]] = 
-          [shuffledRoles[nonWhiteIndex], shuffledRoles[roleRevealStartIndex]];
-      }
-    }
-    
-    // Assign roles to players while keeping player order intact
-    const updatedPlayers = players.map((player, index) => ({
-      ...player,
-      role: shuffledRoles[index].role,
-      word: shuffledRoles[index].word,
-      isAlive: true,
-      hasGivenClue: false,
-    }));
+    const { players } = get();
 
-    set({ players: updatedPlayers, wordPair });
+    // For fresh games (started from SetupScreen), always start role reveal from Player 1
+    const nextStartIndex = 0;
+
+    // Use index-based random assignment to guarantee unbiased distribution
+    const totalPlayers = players.length;
+    const indices = shuffleArray(Array.from({ length: totalPlayers }, (_, i) => i));
+
+    // Pick random indices for Undercover and Mr. White
+    const undercoverIndices = new Set(indices.slice(0, undercoverCount));
+    const mrWhiteIndices = new Set(indices.slice(undercoverCount, undercoverCount + mrWhiteCount));
+
+    const updatedPlayers = players.map((player, idx) => {
+      let role: Role = 'civilian';
+      let word: string | null = wordPair.civilian_word;
+
+      if (undercoverIndices.has(idx)) {
+        role = 'undercover';
+        word = wordPair.undercover_word;
+      } else if (mrWhiteIndices.has(idx)) {
+        role = 'mrwhite';
+        word = null;
+      }
+
+      return {
+        ...player,
+        role,
+        word,
+        isAlive: true,
+        hasGivenClue: false,
+      };
+    });
+
+    set({ players: updatedPlayers, wordPair, roleRevealStartIndex: nextStartIndex });
   },
 
   eliminatePlayer: (playerId) => {
@@ -163,6 +153,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       winner: null,
       roundPlayerOrder: [],
       mrWhiteGuessedCorrectly: false,
+      roleRevealStartIndex: 0,
+      gameNumber: 1,
     });
   },
 
@@ -199,12 +191,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   startNextGame: (wordPair, undercoverCount = 1, mrWhiteCount = 1) => {
-    const { players, roleRevealStartIndex, gameNumber } = get();
-    
-    // Calculate next role reveal start index (rotate to next player)
+    const { players, gameNumber, roleRevealStartIndex } = get();
+
+    // Rotate role reveal start index: Game 1 -> Player 1, Game 2 -> Player 2, etc.
     const nextStartIndex = (roleRevealStartIndex + 1) % players.length;
-    
-    // Reset players for new game (keep names but reset roles/status)
+
+    // Reset players for new game (keep names and cumulative points but reset roles/status)
     const resetPlayers = players.map((player) => ({
       ...player,
       role: "civilian" as Role,
@@ -212,40 +204,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isAlive: true,
       hasGivenClue: false,
     }));
-    
-    // Create role assignments
+
+    // Randomly pick indices for special roles to ensure unbiased distribution
     const totalPlayers = players.length;
-    const roles: { role: Role; word: string | null }[] = [];
-    
-    for (let i = 0; i < undercoverCount; i++) {
-      roles.push({ role: "undercover" as Role, word: wordPair.undercover_word });
-    }
-    for (let i = 0; i < mrWhiteCount; i++) {
-      roles.push({ role: "mrwhite" as Role, word: null });
-    }
-    for (let i = undercoverCount + mrWhiteCount; i < totalPlayers; i++) {
-      roles.push({ role: "civilian" as Role, word: wordPair.civilian_word });
-    }
-    
-    // Shuffle roles
-    let shuffledRoles = shuffleArray([...roles]);
-    
-    // Ensure first player in reveal order doesn't get Mr. White
-    if (shuffledRoles[nextStartIndex]?.role === "mrwhite") {
-      const nonWhiteIndex = shuffledRoles.findIndex((r) => r.role !== "mrwhite");
-      if (nonWhiteIndex !== -1) {
-        [shuffledRoles[nextStartIndex], shuffledRoles[nonWhiteIndex]] = 
-          [shuffledRoles[nonWhiteIndex], shuffledRoles[nextStartIndex]];
+    const indices = shuffleArray(Array.from({ length: totalPlayers }, (_, i) => i));
+    const undercoverIndices = new Set(indices.slice(0, undercoverCount));
+    const mrWhiteIndices = new Set(indices.slice(undercoverCount, undercoverCount + mrWhiteCount));
+
+    const updatedPlayers = resetPlayers.map((player, idx) => {
+      let role: Role = 'civilian';
+      let word: string | null = wordPair.civilian_word;
+
+      if (undercoverIndices.has(idx)) {
+        role = 'undercover';
+        word = wordPair.undercover_word;
+      } else if (mrWhiteIndices.has(idx)) {
+        role = 'mrwhite';
+        word = null;
       }
-    }
-    
-    // Assign roles to players
-    const updatedPlayers = resetPlayers.map((player, index) => ({
-      ...player,
-      role: shuffledRoles[index].role,
-      word: shuffledRoles[index].word,
-    }));
-    
+
+      return {
+        ...player,
+        role,
+        word,
+      };
+    });
+
     set({
       players: updatedPlayers,
       wordPair,

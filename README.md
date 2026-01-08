@@ -111,9 +111,8 @@ undercover_game/
 │   └── game.ts                # TypeScript types
 ├── lib/
 │   ├── utils.ts               # Utility functions
-│   ├── theme.ts               # Theme configuration
 │   └── wordGenerator.ts       # Word generation logic
-└── public/                    # Static assets
+└── public/                    # Static assets (icons, manifest)
 ```
 
 ## 🎨 Tech Stack

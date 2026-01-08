@@ -77,6 +77,21 @@ export async function POST(request: NextRequest) {
     hard: "abstract concepts, similar meanings, or subtle differences",
   };
 
+  // Server-side random language selection (true randomness, not LLM-dependent)
+  const selectedLanguage = Math.random() < 0.5 ? "English" : "Hinglish";
+  console.log(`🌐 Selected language for this game: ${selectedLanguage}`);
+
+  // Language-specific instructions
+  const languageInstructions = selectedLanguage === "English"
+    ? `- You MUST use ENGLISH words only.
+- Use common English words that are widely understood.
+- Both civilian_word and undercover_word must be in English.`
+    : `- You MUST use HINGLISH words only.
+- Hinglish means Hindi words written using English/Latin alphabet (e.g., "Seb", "Kela", "Paani", "Chai", "Roti").
+- Do NOT use Devanagari script. All words must be typeable on an English keyboard.
+- Both civilian_word and undercover_word must be in Hinglish.
+- Use simple, phonetic spellings that Indians commonly use (e.g., "Paani" not "Pani", "Chai" not "Chay").`;
+
   // IMPORTANT: keep the response strictly JSON only in the prompt so parsing is robust
   const prompt = `
 You are a helpful assistant that returns ONLY a single JSON object.
@@ -85,13 +100,11 @@ Do NOT include markdown, explanations, or extra text.
 Your task is to generate ONE word pair for an Undercover-style party game.
 
 ====================
-LANGUAGE RULES
+LANGUAGE: ${selectedLanguage.toUpperCase()} (MANDATORY)
 ====================
-- Words may be in EITHER English OR Hindi.
-- If the civilian_word is English, the undercover_word MUST also be English.
-- If the civilian_word is Hindi, the undercover_word MUST also be Hindi.
+${languageInstructions}
 - Do NOT mix languages in a single pair.
-- Use genuine, commonly used words only (no slang, no transliterations).
+- Use genuine, commonly used words only (no slang).
 
 ====================
 WORD RULES
@@ -223,7 +236,8 @@ Difficulty guidance: ${difficultyPrompts[difficulty]}.`;
 
     console.log("✓ Successfully generated word pair from Gemini!");
     console.log("Word pair:", wordPair);
-    return NextResponse.json({ wordPair, source: "gemini" });
+    console.log("Language:", selectedLanguage);
+    return NextResponse.json({ wordPair, source: "gemini", language: selectedLanguage });
   } catch (err) {
     console.error("=== ERROR in generate-words handler ===");
     console.error(
