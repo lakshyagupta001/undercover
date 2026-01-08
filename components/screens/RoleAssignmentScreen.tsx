@@ -1,32 +1,43 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import { useGameStore } from '@/store/gameStore';
 import { Player } from '@/types/game';
 
 export default function RoleAssignmentScreen() {
-  const { players, setPhase } = useGameStore();
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  const { players, setPhase, roleRevealStartIndex } = useGameStore();
+  const [revealIndex, setRevealIndex] = useState(0); // Which player in the reveal order we're on
   const [isRevealing, setIsRevealing] = useState(false);
   const [showWord, setShowWord] = useState(false);
 
-  const currentPlayer = players[currentPlayerIndex];
-  const isLastPlayer = currentPlayerIndex === players.length - 1;
+  // Create the role reveal order: starts from roleRevealStartIndex and wraps around
+  const roleRevealOrder = useMemo(() => {
+    const order: number[] = [];
+    for (let i = 0; i < players.length; i++) {
+      order.push((roleRevealStartIndex + i) % players.length);
+    }
+    return order;
+  }, [players.length, roleRevealStartIndex]);
+
+  // Current player based on reveal order
+  const currentPlayerArrayIndex = roleRevealOrder[revealIndex];
+  const currentPlayer = players[currentPlayerArrayIndex];
+  const isLastPlayer = revealIndex === players.length - 1;
 
   useEffect(() => {
     // Vibrate when player changes (if supported)
     if (navigator.vibrate) {
       navigator.vibrate(100);
     }
-  }, [currentPlayerIndex]);
+  }, [revealIndex]);
 
   const handleReveal = () => {
     setIsRevealing(true);
     setShowWord(true);
     
-    // Auto-hide after 5 seconds
+    // Auto-hide after 50 seconds
     setTimeout(() => {
       setShowWord(false);
     }, 50000);
@@ -38,9 +49,9 @@ export default function RoleAssignmentScreen() {
     
     if (isLastPlayer) {
       // All players have seen their roles, start the game
-      setPhase('description-round');
+      setPhase('discussion');
     } else {
-      setCurrentPlayerIndex(currentPlayerIndex + 1);
+      setRevealIndex(revealIndex + 1);
     }
   };
 
@@ -121,7 +132,7 @@ export default function RoleAssignmentScreen() {
             </Button>
 
             <div className="mt-6 text-ivory-faint text-sm">
-              Player {currentPlayerIndex + 1} of {players.length}
+              Player {revealIndex + 1} of {players.length}
             </div>
           </motion.div>
         ) : (
@@ -197,7 +208,7 @@ export default function RoleAssignmentScreen() {
           <motion.div
             className="h-full bg-gradient-primary"
             initial={{ width: 0 }}
-            animate={{ width: `${((currentPlayerIndex + 1) / players.length) * 100}%` }}
+            animate={{ width: `${((revealIndex + 1) / players.length) * 100}%` }}
             transition={{ duration: 0.3 }}
           />
         </div>

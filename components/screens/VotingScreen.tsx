@@ -1,26 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import PlayerAvatar from '@/components/ui/PlayerAvatar';
 import { useGameStore } from '@/store/gameStore';
-import { shuffleArray } from '@/lib/utils';
 
 export default function VotingScreen() {
-  const { players, eliminatePlayer, setPhase } = useGameStore();
+  const { players, eliminatePlayer, setPhase, roundPlayerOrder } = useGameStore();
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
-  const [randomizedPlayers, setRandomizedPlayers] = useState<typeof players>([]);
 
-  // Randomize player order for voting
-  useEffect(() => {
-    const alive = players.filter(p => p.isAlive);
-    const shuffled = shuffleArray(alive);
-    setRandomizedPlayers(shuffled);
-  }, [players.filter(p => p.isAlive).length]); // Re-randomize when players change
-
-  const alivePlayers = randomizedPlayers.length > 0 ? randomizedPlayers : players.filter(p => p.isAlive);
+  // Use the same order as description/discussion phases from the store
+  const alivePlayers = roundPlayerOrder.length > 0
+    ? roundPlayerOrder
+        .map(id => players.find(p => p.id === id))
+        .filter((p): p is typeof players[0] => p !== undefined && p.isAlive)
+    : players.filter(p => p.isAlive);
 
   const handleSelectPlayer = (playerId: string) => {
     setSelectedPlayerId(playerId);
@@ -41,13 +37,14 @@ export default function VotingScreen() {
   };
 
   const handleSkipVote = () => {
-    // Skip voting this round, go back to description
+    // Skip voting this round, go back to discussion with new order
     const updatedPlayers = players.map(p => ({ ...p, hasGivenClue: false }));
     useGameStore.setState({ 
       players: updatedPlayers,
-      currentRound: useGameStore.getState().currentRound + 1 
+      currentRound: useGameStore.getState().currentRound + 1,
+      roundPlayerOrder: [] // Reset so new order is generated for next round
     });
-    setPhase('description-round');
+    setPhase('discussion');
   };
 
   return (

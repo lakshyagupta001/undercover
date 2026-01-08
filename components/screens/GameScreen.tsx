@@ -1,36 +1,34 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import PlayerAvatar from '@/components/ui/PlayerAvatar';
 import { useGameStore } from '@/store/gameStore';
-import { shuffleArray } from '@/lib/utils';
 
 export default function GameScreen() {
-  const { players, currentRound, phase, setPhase } = useGameStore();
-  const [randomizedPlayers, setRandomizedPlayers] = useState<typeof players>([]);
+  const { players, currentRound, setPhase, roundPlayerOrder, setRoundPlayerOrder } = useGameStore();
   
-  // Randomize player order for display when round, phase changes, or when players are eliminated
+  // Set player order once when entering discussion (start of a new round)
+  // The order persists through discussion and voting phases
   useEffect(() => {
-    const alive = players.filter(p => p.isAlive);
-    const shuffled = shuffleArray([...alive]); // Create new array to trigger re-render
-    setRandomizedPlayers(shuffled);
-  }, [currentRound, phase, players.length, players.filter(p => p.isAlive).length]); // Re-randomize on new round/phase or when alive count changes
+    if (roundPlayerOrder.length === 0) {
+      setRoundPlayerOrder();
+    }
+  }, [roundPlayerOrder.length, setRoundPlayerOrder]);
   
-  const alivePlayers = randomizedPlayers.length > 0 ? randomizedPlayers : players.filter(p => p.isAlive);
+  // Get players in the stored order, ensuring Mr. White is never first
+  const alivePlayers = roundPlayerOrder.length > 0
+    ? roundPlayerOrder
+        .map(id => players.find(p => p.id === id))
+        .filter((p): p is typeof players[0] => p !== undefined && p.isAlive)
+    : players.filter(p => p.isAlive);
+  
   const allPlayersGaveClues = alivePlayers.every(p => p.hasGivenClue);
 
   const handleStartVoting = () => {
     setPhase('voting');
-  };
-
-  const handleNextRound = () => {
-    // Reset clue status for next round
-    const updatedPlayers = players.map(p => ({ ...p, hasGivenClue: false }));
-    useGameStore.setState({ players: updatedPlayers, currentRound: currentRound + 1 });
-    setPhase('description-round');
   };
 
   return (
@@ -45,9 +43,7 @@ export default function GameScreen() {
           <h1 className="font-display text-3xl font-bold mb-2 text-ivory">
             Round {currentRound}
           </h1>
-          <p className="text-ivory-dim">
-            {phase === 'description-round' ? 'Description Phase' : 'Discussion Phase'}
-          </p>
+          <p className="text-ivory-dim">Discussion Phase</p>
         </motion.div>
 
         {/* Game Info */}
@@ -70,41 +66,39 @@ export default function GameScreen() {
                 <p className="text-2xl font-bold text-ivory">
                   {alivePlayers.filter(p => p.hasGivenClue).length}/{alivePlayers.length}
                 </p>
-                <p className="text-sm text-ivory-dim">Clues Given</p>
+                <p className="text-sm text-ivory-dim">Words Given</p>
               </div>
             </div>
           </Card>
         </motion.div>
 
         {/* Instructions */}
-        {phase === 'description-round' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <Card className="bg-gradient-to-r from-accent/20 to-gold/10 border border-accent/20">
-              <div className="flex items-start gap-4">
-                <div className="text-3xl">💬</div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 text-ivory">
-                    Description Round
-                  </h3>
-                  <p className="text-ivory-soft text-sm mb-2">
-                    Each player must give ONE clue about their word verbally, in turn.
-                  </p>
-                  <p className="text-ivory-dim text-xs">
-                    • Civilians: Be specific but not obvious<br />
-                    • Undercover: Your word is related but different<br />
-                    • Mr. White: Listen and blend in!
-                  </p>
-                </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <Card className="bg-gradient-to-r from-accent/20 to-gold/10 border border-accent/20">
+            <div className="flex items-start gap-4">
+              <div className="text-3xl">🗣️</div>
+              <div>
+                <h3 className="font-semibold text-lg mb-2 text-ivory">
+                  Discussion Round
+                </h3>
+                <p className="text-ivory-soft text-sm mb-2">
+                  Each player says <strong>ONE word</strong> related to their secret word, then discuss who seems suspicious.
+                </p>
+                <p className="text-ivory-dim text-xs">
+                  • Civilians: Be specific but not obvious<br />
+                  • Undercover: Your word is related but different<br />
+                  • Mr. White: Listen carefully and blend in!
+                </p>
               </div>
-            </Card>
-          </motion.div>
-        )}
+            </div>
+          </Card>
+        </motion.div>
 
-        {/* Players Grid - Randomized Order */}
+        {/* Players Grid - Consistent Order Throughout Round */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 mb-8">
           {alivePlayers.map((player, index) => {
             const handleToggleClue = () => {
@@ -113,11 +107,6 @@ export default function GameScreen() {
                 p.id === player.id ? { ...p, hasGivenClue: !p.hasGivenClue } : p
               );
               useGameStore.setState({ players: updatedPlayers });
-              
-              // Update randomized list to reflect clue status
-              setRandomizedPlayers(prev => 
-                prev.map(p => p.id === player.id ? { ...p, hasGivenClue: !p.hasGivenClue } : p)
-              );
             };
 
             return (
@@ -154,35 +143,15 @@ export default function GameScreen() {
 
         {/* Action Buttons */}
         <div className="space-y-4">
-          {phase === 'description-round' && (
-            <>
-              {!allPlayersGaveClues && (
-                <Card>
-                  <p className="text-center text-ivory-soft text-sm">
-                    Players give their clues verbally. Check them off as they speak.
-                  </p>
-                </Card>
-              )}
-              
-              {allPlayersGaveClues && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    fullWidth
-                    onClick={() => setPhase('discussion')}
-                  >
-                    💭 Start Discussion
-                  </Button>
-                </motion.div>
-              )}
-            </>
+          {!allPlayersGaveClues && (
+            <Card>
+              <p className="text-center text-ivory-soft text-sm">
+                Players give their one-word clues verbally. Tap each player to mark them as done.
+              </p>
+            </Card>
           )}
-
-          {phase === 'discussion' && (
+          
+          {allPlayersGaveClues && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -190,12 +159,12 @@ export default function GameScreen() {
             >
               <Card>
                 <div className="text-center">
-                  <div className="text-4xl mb-3">🗣️</div>
+                  <div className="text-4xl mb-3">💭</div>
                   <h3 className="font-semibold text-lg mb-2 text-ivory">
-                    Discussion Time
+                    All Clues Given!
                   </h3>
                   <p className="text-ivory-soft text-sm">
-                    Debate who seems suspicious. When ready, proceed to voting.
+                    Discuss who seems suspicious, then proceed to voting.
                   </p>
                 </div>
               </Card>
@@ -226,13 +195,12 @@ export default function GameScreen() {
           </Button>
           <Button
             variant="secondary"
-            onClick={() => setPhase(phase === 'description-round' ? 'discussion' : 'description-round')}
+            onClick={handleStartVoting}
           >
-            {phase === 'description-round' ? 'Skip to Discussion' : 'Back to Descriptions'}
+            Skip to Voting
           </Button>
         </div>
       </div>
     </div>
   );
 }
-

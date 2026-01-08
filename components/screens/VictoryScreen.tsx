@@ -10,7 +10,7 @@ import { useGameStore } from '@/store/gameStore';
 import { shuffleArray } from '@/lib/utils';
 
 export default function VictoryScreen() {
-  const { winner, players, wordPair, resetGame } = useGameStore();
+  const { winner, players, wordPair, setPhase } = useGameStore();
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const [showConfetti, setShowConfetti] = useState(true);
   const [randomizedPlayers, setRandomizedPlayers] = useState(players);
@@ -21,10 +21,8 @@ export default function VictoryScreen() {
       height: window.innerHeight,
     });
 
-    // Randomize player order for display
     setRandomizedPlayers(shuffleArray(players));
 
-    // Stop confetti after 5 seconds
     const timer = setTimeout(() => setShowConfetti(false), 5000);
     return () => clearTimeout(timer);
   }, [players]);
@@ -33,10 +31,6 @@ export default function VictoryScreen() {
 
   const winners = randomizedPlayers.filter(p =>
     winner === 'civilians' ? p.role === 'civilian' : p.role === 'undercover' || p.role === 'mrwhite'
-  );
-
-  const losers = randomizedPlayers.filter(p =>
-    winner === 'civilians' ? p.role !== 'civilian' : p.role === 'civilian'
   );
 
   const getVictoryMessage = () => {
@@ -193,22 +187,22 @@ export default function VictoryScreen() {
           </motion.div>
         )}
 
-        {/* Action Buttons */}
+        {/* Continue to Points */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-          className="space-y-4"
+          transition={{ delay: 0.9 }}
         >
-          <Button variant="primary" size="lg" fullWidth onClick={resetGame}>
-            🎮 Play Again
-          </Button>
-          <Button variant="secondary" size="lg" fullWidth onClick={resetGame}>
-            🏠 Back to Home
+          <Button 
+            variant="primary" 
+            size="lg" 
+            fullWidth 
+            onClick={() => setPhase('points')}
+          >
+            ⭐ View Points
           </Button>
         </motion.div>
       </motion.div>
     </div>
   );
 }
-

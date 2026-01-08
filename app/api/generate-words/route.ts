@@ -2,13 +2,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { WordPair } from "@/types/game";
-import { getRandomWordPair } from "@/data/fallbackWords";
 
 type Difficulty = "easy" | "medium" | "hard";
 
 interface GenerateRequestBody {
   difficulty?: Difficulty;
-  apiKey?: string;
   modelName?: string;
 }
 
@@ -47,47 +45,29 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Prefer explicit apiKey in body, then env var(s)
-  const geminiApiKey =
-    body.apiKey ||
-    process.env.GEMINI_API_KEY ||
-    process.env.NEXT_PUBLIC_GEMINI_API_KEY ||
-    process.env.GOOGLE_API_KEY;
+  // Get API key from environment
+  const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
   console.log("=== GEMINI API DEBUG ===");
   console.log(
-    "Body API Key:",
-    body.apiKey ? `YES (${body.apiKey.substring(0, 10)}...)` : "NO"
-  );
-  console.log("GEMINI_API_KEY:", process.env.GEMINI_API_KEY ? "YES" : "NO");
-  console.log(
     "NEXT_PUBLIC_GEMINI_API_KEY:",
-    process.env.NEXT_PUBLIC_GEMINI_API_KEY ? "YES" : "NO"
-  );
-  console.log("GOOGLE_API_KEY:", process.env.GOOGLE_API_KEY ? "YES" : "NO");
-  console.log(
-    "Final geminiApiKey:",
-    geminiApiKey ? `YES (${geminiApiKey.substring(0, 10)}...)` : "NO"
+    geminiApiKey ? "YES" : "NO"
   );
   console.log("========================");
 
-  // If no API key, return local fallback immediately
+  // If no API key, return error
   if (!geminiApiKey) {
-    console.log("⚠️  NO API KEY FOUND - Using fallback words");
-    const fallback = getRandomWordPair(difficulty);
-    return NextResponse.json({
-      wordPair: fallback,
-      source: "fallback",
-      geminiApiKey: geminiApiKey,
-    });
+    console.log("⚠️  NO API KEY FOUND - Cannot generate words");
+    return NextResponse.json(
+      { error: "Gemini API key is required. Please provide an API key to generate words." },
+      { status: 400 }
+    );
   }
 
   console.log("✓ API Key found, attempting Gemini API call...");
 
   // Model selection: allow override via request, then env var, then default
   const modelName =
-    body.modelName ||
-    process.env.GEMINI_MODEL_NAME ||
     process.env.NEXT_PUBLIC_GEMINI_MODEL_NAME ||
     "gemini-2.5-flash";
 
@@ -98,31 +78,54 @@ export async function POST(request: NextRequest) {
   };
 
   // IMPORTANT: keep the response strictly JSON only in the prompt so parsing is robust
-  const prompt = `You are a helpful assistant that returns ONLY a single JSON object (no markdown, no explanations).
-Generate one word pair for an Undercover-style party game.
+  const prompt = `
+You are a helpful assistant that returns ONLY a single JSON object.
+Do NOT include markdown, explanations, or extra text.
 
-Rules:
-1) Return a JSON object exactly matching the structure below.
-2) civilian_word: a single ENGLISH word or short phrase - must be a genuine English word from English vocabulary ONLY (no Hindi, no transliterated words, no other languages)
-3) undercover_word: a related but DIFFERENT ENGLISH word (genuine English vocabulary) that is similar enough to be confusing but clearly distinct
-4) The two words MUST be related and similar in meaning/category, but they MUST NOT be the same word or synonyms that are too close
-5) The words should be close enough that clues could apply to both, creating ambiguity and making the game challenging
-6) relationship: 1-line description of how the two words are related and what makes them similar yet different.
-7) Both words MUST be from ENGLISH language vocabulary ONLY - no Hindi words, no foreign language words, no transliterations.
-8) Use only universal English concepts that would be found in an English dictionary.
-9) Words must be safe for all ages and not political, violent, or obscene.
+Your task is to generate ONE word pair for an Undercover-style party game.
 
-Examples of good pairs:
-- "Doctor" and "Nurse" (both medical professionals, similar but different roles)
-- "Sea" and "River" (both large water bodies, subtly different)
-- "Book" and "Novel" (related reading materials, one more specific)
+====================
+LANGUAGE RULES
+====================
+- Words may be in EITHER English OR Hindi.
+- If the civilian_word is English, the undercover_word MUST also be English.
+- If the civilian_word is Hindi, the undercover_word MUST also be Hindi.
+- Do NOT mix languages in a single pair.
+- Use genuine, commonly used words only (no slang, no transliterations).
 
-Output EXACT structure (no extra fields):
+====================
+WORD RULES
+====================
+- civilian_word: a single word or short phrase.
+- undercover_word: a related but DIFFERENT word or short phrase.
+- The two words MUST:
+  - Belong to the same category or domain
+  - Be similar enough that clues could apply to both
+  - Be clearly distinct (NOT the same word)
+  - NOT be exact synonyms or near-identical meanings
+
+====================
+CONTENT SAFETY
+====================
+- Words must be safe for all ages.
+- No political, violent, adult, or offensive content.
+
+====================
+OUTPUT FORMAT (STRICT)
+====================
+Return EXACTLY this JSON structure and nothing else:
+
 {
   "civilian_word": "string",
   "undercover_word": "string",
-  "relationship": "string"
+  "relationship": "One-line explanation of how the two words are related and why they are similar yet different."
 }
+====================
+WORD PAIR REQUIREMENTS
+====================
+- Choose words that fit the selected difficulty level.
+- Ensure the words are neither too easy nor too obscure.
+- Make sure the relationship is clear and logical.
 
 Difficulty guidance: ${difficultyPrompts[difficulty]}.`;
 
@@ -207,13 +210,15 @@ Difficulty guidance: ${difficultyPrompts[difficulty]}.`;
       }
     }
 
-    // If we couldn't parse or validation failed, fallback to local words
+    // If we couldn't parse or validation failed, return error
     if (!wordPair) {
       console.warn(
-        "⚠️  AI response invalid or parse failed. Falling back to local words."
+        "⚠️  AI response invalid or parse failed."
       );
-      wordPair = getRandomWordPair(difficulty);
-      return NextResponse.json({ wordPair, source: "fallback-parse-error" });
+      return NextResponse.json(
+        { error: "Failed to parse AI response. Please try again." },
+        { status: 500 }
+      );
     }
 
     console.log("✓ Successfully generated word pair from Gemini!");
@@ -230,9 +235,11 @@ Difficulty guidance: ${difficultyPrompts[difficulty]}.`;
       err instanceof Error ? err.message : String(err)
     );
     console.error("Full error:", err);
-    console.log("Returning fallback words due to error");
-    // On any error return local fallback
-    const fallback = getRandomWordPair(difficulty);
-    return NextResponse.json({ wordPair: fallback, source: "fallback-error" });
+    
+    // Return error response
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Failed to generate words from Gemini API" },
+      { status: 500 }
+    );
   }
 }

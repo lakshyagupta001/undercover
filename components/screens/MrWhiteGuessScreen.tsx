@@ -7,7 +7,7 @@ import Card from '@/components/ui/Card';
 import { useGameStore } from '@/store/gameStore';
 
 export default function MrWhiteGuessScreen() {
-  const { eliminatedPlayer, wordPair, setPhase, players, currentRound } = useGameStore();
+  const { eliminatedPlayer, wordPair, setPhase, players, currentRound, setMrWhiteGuessResult } = useGameStore();
   const [guess, setGuess] = useState('');
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -26,6 +26,9 @@ export default function MrWhiteGuessScreen() {
     const correct = civilianWord === userGuess;
     setIsCorrect(correct);
     setShowResult(true);
+    
+    // Record the guess result for points calculation
+    setMrWhiteGuessResult(correct);
 
     if (correct) {
       // Mr. White guessed correctly - Infiltrators win!
@@ -42,6 +45,8 @@ export default function MrWhiteGuessScreen() {
   };
 
   const handleSkip = () => {
+    // Skipping counts as wrong guess
+    setMrWhiteGuessResult(false);
     setPhase('role-reveal');
   };
 

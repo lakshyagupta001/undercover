@@ -11,8 +11,6 @@ export default function SetupScreen() {
   const [playerCount, setPlayerCount] = useState(5);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [isLoading, setIsLoading] = useState(false);
-  const [apiKey, setApiKey] = useState('');
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   
   // Role counts
   const [undercoverCount, setUndercoverCount] = useState(1);
@@ -62,7 +60,7 @@ export default function SetupScreen() {
       initializePlayers(playerCount);
       
       // Generate word pair
-      const wordPair = await generateWordPair(difficulty, apiKey || undefined);
+      const wordPair = await generateWordPair(difficulty);
       
       // Assign roles with custom counts
       assignRoles(wordPair, undercoverCount, mrWhiteCount);
@@ -247,38 +245,6 @@ export default function SetupScreen() {
               <p>• Medium: Moderately familiar concepts</p>
               <p>• Hard: Abstract or similar meanings</p>
             </div>
-          </Card>
-
-          <Card>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-lg text-ivory">AI Word Generator</h3>
-              <button
-                onClick={() => setShowApiKeyInput(!showApiKeyInput)}
-                className="text-sm text-gold hover:text-gold-light transition-colors"
-              >
-                {showApiKeyInput ? 'Hide' : 'Configure'}
-              </button>
-            </div>
-            
-            {showApiKeyInput && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="mb-3"
-              >
-                <input
-                  type="password"
-                  placeholder="Enter Gemini API Key (optional)"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  className="w-full bg-base/50 border border-ivory/20 rounded-lg px-4 py-2 text-ivory placeholder-ivory-faint focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
-                />
-              </motion.div>
-            )}
-            
-            <p className="text-xs text-ivory-faint">
-              {apiKey ? '✓ AI-generated words enabled' : 'Using fallback word list (offline mode)'}
-            </p>
           </Card>
 
           <Button

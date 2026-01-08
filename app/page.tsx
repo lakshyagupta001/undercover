@@ -10,6 +10,7 @@ import VotingScreen from '@/components/screens/VotingScreen';
 import MrWhiteGuessScreen from '@/components/screens/MrWhiteGuessScreen';
 import RoleRevealScreen from '@/components/screens/RoleRevealScreen';
 import VictoryScreen from '@/components/screens/VictoryScreen';
+import PointsScreen from '@/components/screens/PointsScreen';
 import RulesScreen from '@/components/screens/RulesScreen';
 import { useState } from 'react';
 
@@ -30,7 +31,6 @@ export default function Home() {
       return <PlayerNamesScreen />;
     case 'role-assignment':
       return <RoleAssignmentScreen />;
-    case 'description-round':
     case 'discussion':
       return <GameScreen />;
     case 'voting':
@@ -41,6 +41,8 @@ export default function Home() {
       return <RoleRevealScreen />;
     case 'victory':
       return <VictoryScreen />;
+    case 'points':
+      return <PointsScreen />;
     default:
       return <HomeScreen onShowRules={() => setShowRules(true)} />;
   }

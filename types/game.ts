@@ -5,12 +5,12 @@ export type GamePhase =
   | 'setup'
   | 'player-names'
   | 'role-assignment'
-  | 'description-round'
   | 'discussion'
   | 'voting'
   | 'mrwhite-guess'
   | 'role-reveal'
-  | 'victory';
+  | 'victory'
+  | 'points';
 
 export interface Player {
   id: string;
@@ -20,6 +20,7 @@ export interface Player {
   isAlive: boolean;
   hasGivenClue: boolean;
   avatar: string;
+  points: number; // Cumulative points across games
 }
 
 export interface WordPair {
@@ -30,23 +31,19 @@ export interface WordPair {
 
 export interface GameSettings {
   difficulty: 'easy' | 'medium' | 'hard';
-  soundEnabled: boolean;
-  theme: 'light' | 'dark';
-}
-
-export interface VoteResult {
-  playerId: string;
-  votes: number;
 }
 
 export interface GameState {
   phase: GamePhase;
   players: Player[];
-  currentPlayerIndex: number;
   currentRound: number;
   wordPair: WordPair | null;
   settings: GameSettings;
   eliminatedPlayer: Player | null;
   winner: 'civilians' | 'infiltrators' | null;
+  roundPlayerOrder: string[];
+  roleRevealStartIndex: number;
+  gameNumber: number;
+  mrWhiteGuessedCorrectly: boolean;
 }
 

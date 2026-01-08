@@ -19,13 +19,14 @@ export default function RoleRevealScreen() {
       return;
     }
 
-    // Continue to next round
+    // Continue to next round - reset roundPlayerOrder so new order is generated
     const updatedPlayers = players.map(p => ({ ...p, hasGivenClue: false }));
     useGameStore.setState({ 
       players: updatedPlayers,
-      currentRound: currentRound + 1 
+      currentRound: currentRound + 1,
+      roundPlayerOrder: [] // Reset so new order is generated for next round
     });
-    setPhase('description-round');
+    setPhase('discussion');
   };
 
   const getRoleColor = (role: typeof eliminatedPlayer.role) => {
