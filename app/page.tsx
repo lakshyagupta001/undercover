@@ -5,8 +5,10 @@ import HomeScreen from '@/components/screens/HomeScreen';
 import SetupScreen from '@/components/screens/SetupScreen';
 import PlayerNamesScreen from '@/components/screens/PlayerNamesScreen';
 import RoleAssignmentScreen from '@/components/screens/RoleAssignmentScreen';
+import RoundStartScreen from '@/components/screens/RoundStartScreen';
 import GameScreen from '@/components/screens/GameScreen';
 import VotingScreen from '@/components/screens/VotingScreen';
+import RevengerScreen from '@/components/screens/RevengerScreen';
 import MrWhiteGuessScreen from '@/components/screens/MrWhiteGuessScreen';
 import RoleRevealScreen from '@/components/screens/RoleRevealScreen';
 import VictoryScreen from '@/components/screens/VictoryScreen';
@@ -31,10 +33,14 @@ export default function Home() {
       return <PlayerNamesScreen />;
     case 'role-assignment':
       return <RoleAssignmentScreen />;
+    case 'round-start':
+      return <RoundStartScreen />;
     case 'discussion':
       return <GameScreen />;
     case 'voting':
       return <VotingScreen />;
+    case 'revenger':
+      return <RevengerScreen />;
     case 'mrwhite-guess':
       return <MrWhiteGuessScreen />;
     case 'role-reveal':

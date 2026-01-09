@@ -6,19 +6,67 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { useGameStore } from '@/store/gameStore';
 import { generateWordPair } from '@/lib/wordGenerator';
+import { SpecialRoleConfig } from '@/types/game';
+
+interface SpecialRoleOption {
+  key: keyof SpecialRoleConfig;
+  icon: string;
+  name: string;
+  description: string;
+  minPlayers: number;
+}
+
+const specialRoleOptions: SpecialRoleOption[] = [
+  { key: 'goddess', icon: '⚖️', name: 'Goddess of Justice', description: 'Breaks vote ties', minPlayers: 3 },
+  { key: 'lovers', icon: '💖', name: 'Lovers', description: 'Linked fate pair', minPlayers: 5 },
+  { key: 'meme', icon: '😂', name: 'Mr. Meme', description: 'Gestures only', minPlayers: 3 },
+  { key: 'revenger', icon: '🔥', name: 'Revenger', description: 'Revenge on death', minPlayers: 5 },
+  { key: 'ghost', icon: '👻', name: 'Ghost', description: 'Vote after death', minPlayers: 3 },
+  { key: 'falafelVendor', icon: '🧆', name: 'Falafel Vendor', description: 'Random effects', minPlayers: 4 },
+];
 
 export default function SetupScreen() {
   const [playerCount, setPlayerCount] = useState(5);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Role counts
   const [undercoverCount, setUndercoverCount] = useState(1);
   const [mrWhiteCount, setMrWhiteCount] = useState(1);
-  
-  const { initializePlayers, assignRoles, setPhase, updateSettings } = useGameStore();
+
+  // Special roles
+  const [specialRoles, setSpecialRoles] = useState<SpecialRoleConfig>({
+    goddess: false,
+    lovers: false,
+    meme: false,
+    revenger: false,
+    ghost: false,
+    falafelVendor: false,
+  });
+
+  const { initializePlayers, assignRoles, setPhase, updateSettings, setSpecialRoleConfig, assignSpecialRoles } = useGameStore();
 
   const civilianCount = playerCount - undercoverCount - mrWhiteCount;
+
+  const toggleSpecialRole = (role: keyof SpecialRoleConfig) => {
+    const option = specialRoleOptions.find(r => r.key === role);
+    if (option && playerCount < option.minPlayers && !specialRoles[role]) {
+      return; // Can't enable if player count is too low
+    }
+    setSpecialRoles(prev => ({ ...prev, [role]: !prev[role] }));
+  };
+
+  const getSpecialRoleErrors = (): string[] => {
+    const errors: string[] = [];
+    specialRoleOptions.forEach(option => {
+      if (specialRoles[option.key] && playerCount < option.minPlayers) {
+        errors.push(`${option.name} requires ${option.minPlayers}+ players`);
+      }
+    });
+    return errors;
+  };
+
+  const specialRoleErrors = getSpecialRoleErrors();
 
   const adjustRoleCount = (role: 'undercover' | 'mrwhite', change: number) => {
     if (role === 'undercover') {
@@ -42,6 +90,14 @@ export default function SetupScreen() {
       setUndercoverCount(Math.min(1, maxInfiltrators));
       setMrWhiteCount(Math.min(1, maxInfiltrators - undercoverCount));
     }
+    // Disable special roles that require more players
+    const updatedSpecialRoles = { ...specialRoles };
+    specialRoleOptions.forEach(option => {
+      if (count < option.minPlayers) {
+        updatedSpecialRoles[option.key] = false;
+      }
+    });
+    setSpecialRoles(updatedSpecialRoles);
   };
 
   const handleStartGame = async () => {
@@ -50,21 +106,37 @@ export default function SetupScreen() {
       return;
     }
 
+    if (specialRoleErrors.length > 0) {
+      alert(specialRoleErrors.join('\n'));
+      return;
+    }
+
     setIsLoading(true);
-    
+
     try {
       // Update difficulty setting
       updateSettings({ difficulty });
-      
+
+      // Set special role config
+      setSpecialRoleConfig(specialRoles);
+
       // Initialize players
       initializePlayers(playerCount);
-      
-      // Generate word pair
-      const wordPair = await generateWordPair(difficulty);
-      
-      // Assign roles with custom counts
-      assignRoles(wordPair, undercoverCount, mrWhiteCount);
-      
+
+      // Generate word pair with fallback support
+      const result = await generateWordPair(difficulty);
+
+      // Show warning if switching to fallback mode for the first time
+      if (result.showWarning) {
+        alert('⚠️ API tokens exhausted! Using offline word pairs. Add a new API key in .env.local to restore AI-generated words.');
+      }
+
+      // Assign core roles
+      assignRoles(result.wordPair, undercoverCount, mrWhiteCount);
+
+      // Assign special roles
+      assignSpecialRoles();
+
       // Move to player names phase
       setPhase('player-names');
     } catch (error) {
@@ -76,7 +148,7 @@ export default function SetupScreen() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-base">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-base overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -90,7 +162,7 @@ export default function SetupScreen() {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-lg"
+        className="w-full max-w-lg py-16"
       >
         <h1 className="font-display text-4xl font-bold text-center mb-8 text-ivory">
           Game Setup
@@ -100,7 +172,7 @@ export default function SetupScreen() {
           <Card>
             <h3 className="font-semibold text-xl mb-4 text-ivory">Number of Players</h3>
             <div className="grid grid-cols-5 gap-2">
-              {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((num) => (
+              {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((num) => (
                 <button
                   key={num}
                   onClick={() => handlePlayerCountChange(num)}
@@ -120,7 +192,7 @@ export default function SetupScreen() {
 
           <Card>
             <h3 className="font-semibold text-xl mb-4 text-ivory">Configure Roles</h3>
-            
+
             {/* Civilians */}
             <div className="mb-4 p-4 glass rounded-xl border border-ivory/5">
               <div className="flex items-center justify-between">
@@ -221,6 +293,55 @@ export default function SetupScreen() {
             </div>
           </Card>
 
+          {/* Special Roles */}
+          <Card>
+            <h3 className="font-semibold text-xl mb-4 text-ivory">✨ Special Roles</h3>
+            <p className="text-ivory-dim text-sm mb-4">Enable optional roles for extra fun!</p>
+
+            <div className="grid grid-cols-2 gap-3">
+              {specialRoleOptions.map((option) => {
+                const isEnabled = specialRoles[option.key];
+                const isDisabled = playerCount < option.minPlayers;
+
+                return (
+                  <button
+                    key={option.key}
+                    onClick={() => toggleSpecialRole(option.key)}
+                    disabled={isDisabled && !isEnabled}
+                    className={`
+                      p-3 rounded-xl text-left transition-all duration-200 border
+                      ${isEnabled
+                        ? 'bg-gradient-to-r from-accent/30 to-gold/20 border-accent/40 shadow-lg'
+                        : isDisabled
+                          ? 'glass border-ivory/5 opacity-40 cursor-not-allowed'
+                          : 'glass border-ivory/5 hover:border-accent/30 hover:bg-surface-light/50'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xl">{option.icon}</span>
+                      <span className={`font-semibold text-sm ${isEnabled ? 'text-ivory' : 'text-ivory-dim'}`}>
+                        {option.name}
+                      </span>
+                    </div>
+                    <p className="text-xs text-ivory-dim">{option.description}</p>
+                    {isDisabled && (
+                      <p className="text-xs text-accent mt-1">{option.minPlayers}+ players</p>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {specialRoleErrors.length > 0 && (
+              <div className="mt-4 p-3 rounded-lg bg-accent/20 border border-accent/30">
+                {specialRoleErrors.map((error, i) => (
+                  <p key={i} className="text-accent text-xs">⚠️ {error}</p>
+                ))}
+              </div>
+            )}
+          </Card>
+
           <Card>
             <h3 className="font-semibold text-xl mb-4 text-ivory">Difficulty Level</h3>
             <div className="grid grid-cols-3 gap-3">
@@ -252,7 +373,7 @@ export default function SetupScreen() {
             size="lg"
             fullWidth
             onClick={handleStartGame}
-            disabled={isLoading}
+            disabled={isLoading || civilianCount < 1 || specialRoleErrors.length > 0}
           >
             {isLoading ? '⏳ Preparing Game...' : '🚀 Start Game'}
           </Button>
@@ -261,4 +382,3 @@ export default function SetupScreen() {
     </div>
   );
 }
-

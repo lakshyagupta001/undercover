@@ -72,7 +72,7 @@ export default function HomeScreen({ onShowRules }: HomeScreenProps) {
           whileHover={{ scale: 1.02 }}
         >
           <p className="text-center text-sm text-ivory-dim mb-2">Players Required</p>
-          <p className="text-center text-2xl font-bold text-gold">3 - 20</p>
+          <p className="text-center text-2xl font-bold text-gold">3 - 15</p>
         </motion.div>
       </motion.div>
     </div>

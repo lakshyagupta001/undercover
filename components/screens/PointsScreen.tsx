@@ -22,8 +22,8 @@ export default function PointsScreen() {
     if (isLoading) return;
     setIsLoading(true);
     try {
-      const newWordPair = await generateWordPair(settings.difficulty);
-      startNextGame(newWordPair, undercoverCount, mrWhiteCount);
+      const result = await generateWordPair(settings.difficulty);
+      startNextGame(result.wordPair, undercoverCount, mrWhiteCount);
     } catch (error) {
       console.error('Error starting next game:', error);
       alert('Failed to start next game. Please try again.');
@@ -63,7 +63,7 @@ export default function PointsScreen() {
           className="text-center mb-8"
         >
           <motion.div
-            animate={{ 
+            animate={{
               rotate: [0, 10, -10, 0],
               scale: [1, 1.1, 1]
             }}
@@ -120,8 +120,8 @@ export default function PointsScreen() {
           className="mb-6"
         >
           <Card>
-            <PointsDisplay 
-              players={players} 
+            <PointsDisplay
+              players={players}
               showRolePoints={true}
               previousPoints={previousPoints}
             />
@@ -135,10 +135,10 @@ export default function PointsScreen() {
           transition={{ delay: 0.5 }}
           className="space-y-3"
         >
-          <Button 
-            variant="primary" 
-            size="lg" 
-            fullWidth 
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
             onClick={handlePlayAgain}
             disabled={isLoading}
           >

@@ -22,11 +22,11 @@ export default function MrWhiteGuessScreen() {
 
     const civilianWord = wordPair?.civilian_word?.toLowerCase().trim();
     const userGuess = guess.toLowerCase().trim();
-    
+
     const correct = civilianWord === userGuess;
     setIsCorrect(correct);
     setShowResult(true);
-    
+
     // Record the guess result for points calculation
     setMrWhiteGuessResult(correct);
 
@@ -152,7 +152,7 @@ export default function MrWhiteGuessScreen() {
               {isCorrect ? (
                 <>
                   <motion.div
-                    animate={{ 
+                    animate={{
                       scale: [1, 1.2, 1],
                       rotate: [0, 10, -10, 0]
                     }}
@@ -176,7 +176,7 @@ export default function MrWhiteGuessScreen() {
               ) : (
                 <>
                   <motion.div
-                    animate={{ 
+                    animate={{
                       scale: [1, 0.9, 1],
                     }}
                     transition={{ duration: 0.5 }}
@@ -191,11 +191,8 @@ export default function MrWhiteGuessScreen() {
                     <p className="text-ivory text-lg mb-2">
                       Your guess: <span className="font-bold">{guess}</span>
                     </p>
-                    <p className="text-ivory text-lg mb-2">
-                      Correct word: <span className="font-bold text-civilian">{wordPair?.civilian_word}</span>
-                    </p>
                     <p className="text-ivory-soft">
-                      Better luck next time!
+                      That&apos;s not the civilian word. Better luck next time!
                     </p>
                   </Card>
                 </>

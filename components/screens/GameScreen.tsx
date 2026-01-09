@@ -1,38 +1,51 @@
 'use client';
 
-import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import PlayerAvatar from '@/components/ui/PlayerAvatar';
 import { useGameStore } from '@/store/gameStore';
+import { useEffect } from 'react';
 
 export default function GameScreen() {
-  const { players, currentRound, setPhase, roundPlayerOrder, setRoundPlayerOrder } = useGameStore();
-  
-  // Set player order once when entering discussion (start of a new round)
-  // The order persists through discussion and voting phases
+  const {
+    players,
+    currentRound,
+    setPhase,
+    roundPlayerOrder,
+    setRoundPlayerOrder,
+    currentMrMeme,
+    specialRoleConfig,
+  } = useGameStore();
+
+  // Set player order once when entering discussion
   useEffect(() => {
     if (roundPlayerOrder.length === 0) {
       setRoundPlayerOrder();
     }
   }, [roundPlayerOrder.length, setRoundPlayerOrder]);
-  
-  // Get players in the stored order, ensuring Mr. White is never first
+
+  // Get players in the stored order (excluding ghosts)
   const alivePlayers = roundPlayerOrder.length > 0
     ? roundPlayerOrder
-        .map(id => players.find(p => p.id === id))
-        .filter((p): p is typeof players[0] => p !== undefined && p.isAlive)
-    : players.filter(p => p.isAlive);
-  
-  const allPlayersGaveClues = alivePlayers.every(p => p.hasGivenClue);
+      .map(id => players.find(p => p.id === id))
+      .filter((p): p is typeof players[0] => p !== undefined && p.isAlive && !p.isGhost)
+    : players.filter(p => p.isAlive && !p.isGhost);
+
+  const mrMemePlayer = currentMrMeme ? players.find(p => p.id === currentMrMeme) : null;
+
+  // Goddess of Justice logic
+  const goddess = specialRoleConfig.goddess
+    ? players.find(p => p.specialRoles.includes('goddess'))
+    : null;
+  const goddessIsAlive = goddess && goddess.isAlive && !goddess.isGhost;
 
   const handleStartVoting = () => {
     setPhase('voting');
   };
 
   return (
-    <div className="min-h-screen p-6 bg-base">
+    <div className="min-h-screen p-6 bg-base overflow-y-auto">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
@@ -46,6 +59,52 @@ export default function GameScreen() {
           <p className="text-ivory-dim">Discussion Phase</p>
         </motion.div>
 
+        {/* Mr. Meme Alert */}
+        {specialRoleConfig.meme && mrMemePlayer && mrMemePlayer.isAlive && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-4"
+          >
+            <Card className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30">
+              <div className="flex items-center gap-4">
+                <div className="text-3xl">😂</div>
+                <div className="flex-1">
+                  <p className="text-ivory font-semibold">
+                    {mrMemePlayer.name} is Mr. Meme!
+                  </p>
+                  <p className="text-ivory-dim text-sm">
+                    Must use gestures only - no speaking!
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+
+        {/* Goddess of Justice Alert (when ALIVE) */}
+        {specialRoleConfig.goddess && goddessIsAlive && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-4"
+          >
+            <Card className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+              <div className="flex items-center gap-4">
+                <div className="text-3xl">⚖️</div>
+                <div className="flex-1">
+                  <p className="text-ivory font-semibold">
+                    Goddess of Justice is Active
+                  </p>
+                  <p className="text-purple-300 text-sm">
+                    If a tie occurs, Goddess vote counts as 2
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        )}
+
         {/* Game Info */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -53,7 +112,7 @@ export default function GameScreen() {
           className="mb-8"
         >
           <Card>
-            <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-2 gap-4 text-center">
               <div>
                 <p className="text-2xl font-bold text-ivory">{alivePlayers.length}</p>
                 <p className="text-sm text-ivory-dim">Players Alive</p>
@@ -61,12 +120,6 @@ export default function GameScreen() {
               <div>
                 <p className="text-2xl font-bold text-gold">{currentRound}</p>
                 <p className="text-sm text-ivory-dim">Current Round</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-ivory">
-                  {alivePlayers.filter(p => p.hasGivenClue).length}/{alivePlayers.length}
-                </p>
-                <p className="text-sm text-ivory-dim">Words Given</p>
               </div>
             </div>
           </Card>
@@ -98,16 +151,10 @@ export default function GameScreen() {
           </Card>
         </motion.div>
 
-        {/* Players Grid - Consistent Order Throughout Round */}
+        {/* Players Grid - NO checkmark, purely informational */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 mb-8">
           {alivePlayers.map((player, index) => {
-            const handleToggleClue = () => {
-              if (!player.isAlive) return;
-              const updatedPlayers = players.map(p =>
-                p.id === player.id ? { ...p, hasGivenClue: !p.hasGivenClue } : p
-              );
-              useGameStore.setState({ players: updatedPlayers });
-            };
+            const isMrMeme = currentMrMeme === player.id;
 
             return (
               <motion.div
@@ -116,23 +163,15 @@ export default function GameScreen() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <Card 
+                <Card
                   className={`
-                    ${player.hasGivenClue ? 'bg-success/10 border-success/30' : ''}
-                    ${player.isAlive ? 'cursor-pointer hover:bg-surface-light/50' : 'opacity-50'}
+                    ${isMrMeme ? 'ring-2 ring-yellow-500/50' : ''}
                   `}
-                  onClick={handleToggleClue}
                 >
-                  <div className="text-center">
+                  <div className="text-center relative">
                     <PlayerAvatar player={player} size="md" />
-                    {player.isAlive && player.hasGivenClue && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="mt-2 text-success-light text-2xl"
-                      >
-                        ✓
-                      </motion.div>
+                    {isMrMeme && (
+                      <div className="absolute -top-1 -left-1 text-lg">😂</div>
                     )}
                   </div>
                 </Card>
@@ -143,42 +182,26 @@ export default function GameScreen() {
 
         {/* Action Buttons */}
         <div className="space-y-4">
-          {!allPlayersGaveClues && (
-            <Card>
-              <p className="text-center text-ivory-soft text-sm">
-                Players give their one-word clues verbally. Tap each player to mark them as done.
+          <Card>
+            <div className="text-center">
+              <div className="text-4xl mb-3">💭</div>
+              <h3 className="font-semibold text-lg mb-2 text-ivory">
+                Ready to Vote?
+              </h3>
+              <p className="text-ivory-soft text-sm">
+                Discuss who seems suspicious, then proceed to voting.
               </p>
-            </Card>
-          )}
-          
-          {allPlayersGaveClues && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-4"
-            >
-              <Card>
-                <div className="text-center">
-                  <div className="text-4xl mb-3">💭</div>
-                  <h3 className="font-semibold text-lg mb-2 text-ivory">
-                    All Clues Given!
-                  </h3>
-                  <p className="text-ivory-soft text-sm">
-                    Discuss who seems suspicious, then proceed to voting.
-                  </p>
-                </div>
-              </Card>
+            </div>
+          </Card>
 
-              <Button
-                variant="danger"
-                size="lg"
-                fullWidth
-                onClick={handleStartVoting}
-              >
-                🗳️ Start Voting
-              </Button>
-            </motion.div>
-          )}
+          <Button
+            variant="danger"
+            size="lg"
+            fullWidth
+            onClick={handleStartVoting}
+          >
+            🗳️ Start Voting
+          </Button>
         </div>
 
         {/* Quick Actions */}

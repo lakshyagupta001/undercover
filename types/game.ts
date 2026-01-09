@@ -1,12 +1,33 @@
 export type Role = 'civilian' | 'undercover' | 'mrwhite';
 
-export type GamePhase = 
+export type SpecialRole = 'goddess' | 'lover' | 'meme' | 'revenger' | 'ghost' | 'falafelVendor';
+
+export interface SpecialRoleConfig {
+  goddess: boolean;
+  lovers: boolean;
+  meme: boolean;
+  revenger: boolean;
+  ghost: boolean;
+  falafelVendor: boolean;
+}
+
+export type FalafelEffectType = 'protect' | 'sabotage';
+
+export interface FalafelEffect {
+  playerId: string;
+  type: FalafelEffectType;
+  used: boolean;
+}
+
+export type GamePhase =
   | 'home'
   | 'setup'
   | 'player-names'
   | 'role-assignment'
+  | 'round-start'
   | 'discussion'
   | 'voting'
+  | 'revenger'
   | 'mrwhite-guess'
   | 'role-reveal'
   | 'victory'
@@ -20,7 +41,12 @@ export interface Player {
   isAlive: boolean;
   hasGivenClue: boolean;
   avatar: string;
-  points: number; // Cumulative points across games
+  points: number;
+  // Special roles
+  specialRoles: SpecialRole[];
+  loverId?: string;
+  isGhost: boolean;
+  hasFalafel?: FalafelEffect;
 }
 
 export interface WordPair {
@@ -32,6 +58,8 @@ export interface WordPair {
 export interface GameSettings {
   difficulty: 'easy' | 'medium' | 'hard';
 }
+
+
 
 export interface GameState {
   phase: GamePhase;
@@ -45,5 +73,11 @@ export interface GameState {
   roleRevealStartIndex: number;
   gameNumber: number;
   mrWhiteGuessedCorrectly: boolean;
+  // Special roles state
+  specialRoleConfig: SpecialRoleConfig;
+  currentMrMeme: string | null;
+  revengerPending: string | null;
+  pendingEliminations: string[];
+  falafelVendorId: string | null;
 }
 

@@ -4,11 +4,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/ui/Button';
 import { useGameStore } from '@/store/gameStore';
-import { Player } from '@/types/game';
 
 export default function RoleAssignmentScreen() {
-  const { players, setPhase, roleRevealStartIndex } = useGameStore();
-  const [revealIndex, setRevealIndex] = useState(0); // Which player in the reveal order we're on
+  const { players, setPhase, roleRevealStartIndex, specialRoleConfig } = useGameStore();
+  const [revealIndex, setRevealIndex] = useState(0);
   const [isRevealing, setIsRevealing] = useState(false);
   const [showWord, setShowWord] = useState(false);
 
@@ -27,7 +26,6 @@ export default function RoleAssignmentScreen() {
   const isLastPlayer = revealIndex === players.length - 1;
 
   useEffect(() => {
-    // Vibrate when player changes (if supported)
     if (navigator.vibrate) {
       navigator.vibrate(100);
     }
@@ -36,26 +34,47 @@ export default function RoleAssignmentScreen() {
   const handleReveal = () => {
     setIsRevealing(true);
     setShowWord(true);
-    
-    // Auto-hide after 50 seconds
-    setTimeout(() => {
-      setShowWord(false);
-    }, 50000);
+    // No auto-hide timer - player must manually tap to continue
   };
 
   const handleNext = () => {
     setIsRevealing(false);
     setShowWord(false);
-    
+
     if (isLastPlayer) {
-      // All players have seen their roles, start the game
-      setPhase('discussion');
+      // All players have seen their roles
+      // Go to round-start if special roles need announcements, else discussion
+      if (specialRoleConfig.meme || specialRoleConfig.falafelVendor) {
+        setPhase('round-start');
+      } else {
+        setPhase('discussion');
+      }
     } else {
       setRevealIndex(revealIndex + 1);
     }
   };
 
   if (!currentPlayer) return null;
+
+  // Get special role display for current player
+  const getSpecialRoleHint = () => {
+    const roles = currentPlayer.specialRoles;
+    if (roles.length === 0) return null;
+
+    const hints: string[] = [];
+    if (roles.includes('goddess')) hints.push('⚖️ Goddess of Justice - You break vote ties!');
+    if (roles.includes('lover')) {
+      const lover = players.find(p => p.id === currentPlayer.loverId);
+      if (lover) hints.push(`💖 Lover - You share fate with ${lover.name}!`);
+    }
+    if (roles.includes('revenger')) hints.push('🔥 Revenger - Choose another to eliminate when you die!');
+    if (roles.includes('ghost')) hints.push('👻 Ghost - You can vote even after elimination!');
+    if (roles.includes('falafelVendor')) hints.push('🧆 Falafel Vendor - You give random effects!');
+
+    return hints;
+  };
+
+  const specialHints = getSpecialRoleHint();
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 no-select bg-base">
@@ -127,19 +146,33 @@ export default function RoleAssignmentScreen() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className="bg-base/50 rounded-xl p-6 backdrop-blur-sm border border-ivory/10"
+                    className="space-y-4"
                   >
-                    <p className="text-ivory-soft text-sm mb-2">Your Word:</p>
-                    {currentPlayer.word ? (
-                      <p className="text-4xl font-bold text-gold break-words">
-                        {currentPlayer.word}
-                      </p>
-                    ) : (
-                      <div>
-                        <p className="text-3xl font-bold text-gold mb-2">❓</p>
-                        <p className="text-ivory-soft text-2xl">
-                         You have no word!  😏 <br/> 🐻‍❄️ MR. WHITE 🐻‍❄️
+                    <div className="bg-base/50 rounded-xl p-6 backdrop-blur-sm border border-ivory/10">
+                      <p className="text-ivory-soft text-sm mb-2">Your Word:</p>
+                      {currentPlayer.word ? (
+                        <p className="text-4xl font-bold text-gold break-words">
+                          {currentPlayer.word}
                         </p>
+                      ) : (
+                        <div>
+                          <p className="text-3xl font-bold text-gold mb-2">❓</p>
+                          <p className="text-ivory-soft text-2xl">
+                            You have no word!  😏 <br /> 🐻‍❄️ MR. WHITE 🐻‍❄️
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Special Role Hints */}
+                    {specialHints && specialHints.length > 0 && (
+                      <div className="bg-accent/20 rounded-xl p-4 border border-accent/30">
+                        <p className="text-ivory-soft text-sm mb-2">✨ Special Role:</p>
+                        {specialHints.map((hint, i) => (
+                          <p key={i} className="text-ivory text-sm">
+                            {hint}
+                          </p>
+                        ))}
                       </div>
                     )}
                   </motion.div>
@@ -179,4 +212,3 @@ export default function RoleAssignmentScreen() {
     </div>
   );
 }
-
